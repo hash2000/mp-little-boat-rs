@@ -1,12 +1,8 @@
 [workspace]
 resolver = "2"
-members = [
-	"little-boat-client"
-]
+members = ["little-boat-client", "little-boat-core"]
 
-default-members = [
-  "little-boat-client"
-]
+default-members = ["little-boat-client", "little-boat-core"]
 
 [profile.dev]
 opt-level = 0
@@ -18,14 +14,25 @@ codegen-units = 1
 lto = true
 
 [workspace.dependencies]
-
-
+tokio = { version = "1.45.1", features = [
+	"rt",
+	"rt-multi-thread",
+	"io-util",
+	"io-std",
+	"time",
+	"process",
+	"macros",
+	"fs",
+	"parking_lot",
+] }
+slint = "1.12.0"
+slint-build = "1.12"
 
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.87"
-authors=["Hash2000 <infinitehash@yandex.ru>"]
-categories=["tools"]
+authors = ["Hash2000 <infinitehash@yandex.ru>"]
+categories = ["tools"]
 repository = "https://github.com/hash2000/mp-little-boat-rs"
 license = "MPL-2.0"

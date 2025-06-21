@@ -15,18 +15,8 @@ name = "little-boat-client"
 path = "src/main.rs"
 
 [dependencies]
-tokio = { version = "1.45.1", features = [
-	"rt", 
-	"rt-multi-thread",
-	"io-util",
-	"io-std",
-	"time", 
-	"process",
-	"macros",
-	"fs",
-	"parking_lot"
-] }
-slint = "1.12.0"
+tokio.workspace = true
+slint.workspace = true
 
 [build-dependencies]
-slint-build = "1.12"
+slint-build.workspace = true
