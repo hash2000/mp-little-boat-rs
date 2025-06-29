@@ -2,17 +2,23 @@ import { GroupBox, ComboBox, VerticalBox, GroupBox, GridBox, Palette, TextEdit, 
 import { UsecasesPalette, FontSettings } from "../../Styles.slint";
 
 export struct ChatGroupItem {
+    uid: string,
+    parent-uid: string,
     title: string,
-    messages-count: int,
+    notifies: int,
     icon: image,
 }
 
 export global ChatGroupsAdapter {
-    out property <[ChatGroupItem]> groups: [
-        { title: "All chats", messages-count: 200 },
-        { title: "New chats", messages-count: 4 },
-        { title: "Voices" },
-        { title: "Video" },
+    in-out property <[ChatGroupItem]> groups: [
+        { title: "All", notifies: 200, uid: "52c6c659-4b8a-4629-8402-355215fd4607" },
+        { title: "Chatcs", uid: "e1923a72-5380-4e01-856e-9f12c1402697" },
+        { title: "Новости", uid: "934bc85d-0f04-4c51-8ba8-87cac576a0aa", parent-uid: "e1923a72-5380-4e01-856e-9f12c1402697" },
+        { title: "РИА Новости", uid: "396d8292-3382-4ee9-a4c9-2fd09662ecce", parent-uid: "934bc85d-0f04-4c51-8ba8-87cac576a0aa" },
+        { title: "Инвестиции", uid: "980c3cc5-5a38-46b1-8936-13268d5ef3d6", parent-uid: "934bc85d-0f04-4c51-8ba8-87cac576a0aa" },
+        { title: "Voices", uid: "bba5188d-2d7a-47df-ada1-b7839ee30f15" },
+        { title: "Voice channel 1", uid: "91dafa45-c6a2-4d7f-9e29-57751820a032", parent-uid: "bba5188d-2d7a-47df-ada1-b7839ee30f15" },
+        { title: "Channels", uid: "444257c4-bb60-4c66-a73f-a6c6696bd420" },
     ];
     in-out property <int> selected-group;
 }
@@ -20,7 +26,7 @@ export global ChatGroupsAdapter {
 export component ChatGroupBarItem {
     in property <bool> is-selected;
     in property <string> title <=> text.text;
-    in property <string> messages-count <=> messages.text;
+    in property <string> notifies <=> messages.text;
     in property <image> icon;
 
     callback select <=> touch-area.clicked; 
@@ -82,13 +88,12 @@ export component ChatGroupSideBar {
             border-radius: UsecasesPalette.use-material ? 0 : 4px;
             border-width: 1px;
             ListView {
-                in-out property <int> selected-item: -1; 
-                
+                in-out property <int> selected-item: -1;                
 
                 for item[index] in ChatGroupsAdapter.groups: ChatGroupBarItem {
                     height: self.min-height;
                     title: item.title;
-                    messages-count: item.messages-count > 0 ? item.messages-count : "";
+                    notifies: item.notifies > 0 ? item.notifies : "";
                     icon: item.icon;
                     is-selected: index == selected-item;
                     
