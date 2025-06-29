@@ -1,0 +1,11 @@
+import { Palette } from "std-widgets.slint";
+import { ChatView } from "widgets/chat/ChatView.slint";
+
+export component ApplicationWindow inherits Window {
+    preferred-width: 700px;
+    preferred-height: 500px;
+    title: "Little Boat";
+
+    main-view := ChatView {}
+
+}
