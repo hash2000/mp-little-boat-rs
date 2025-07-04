@@ -1,0 +1,96 @@
+export struct ChatGroupItem {
+    /// идентификатор текущего узла
+    uid: string,
+    /// уровень в иерархии
+    level: int,
+    /// подпись узла
+    title: string,
+    /// количество событий у текущего узла
+    notifies: int,
+    // содержит вложенные узлы
+    has-children: bool,
+    // открыт
+    is-expanded: bool, 
+    // листовой узел, внутри него нет потомков
+    is-leaf: bool,
+    /// иконка узла
+    icon: image,
+}
+
+export global ChatGroupsAdapter {
+    in-out property <[ChatGroupItem]> groups: [
+        { title: "All", uid: "52c6c659-4b8a-4629-8402-355215fd4607", level: 0, has-children: true, is-leaf: false, is-expanded: true, notifies: 21 },
+        { title: "Chats", uid: "e1923a72-5380-4e01-856e-9f12c1402697", level: 1, has-children: true, is-leaf: false, is-expanded: true, notifies: 21 },
+        { title: "Новости", uid: "934bc85d-0f04-4c51-8ba8-87cac576a0aa", level: 2, has-children: false, is-leaf: true, is-expanded: false, notifies: 10 },
+        { title: "РИА Новости", uid: "396d8292-3382-4ee9-a4c9-2fd09662ecce", level: 2, has-children: false, is-leaf: true, is-expanded: false, notifies: 5 },
+        { title: "Инвестиции", uid: "980c3cc5-5a38-46b1-8936-13268d5ef3d6", level: 1, has-children: true, is-leaf: false, is-expanded: true, notifies: 6 },
+        { title: "Bonds", uid: "980c3cc5-5a38-46b1-8936-13268d5ef3d6", level: 2, has-children: false, is-leaf: true, is-expanded: true },
+        { title: "Voices", uid: "bba5188d-2d7a-47df-ada1-b7839ee30f15", level: 0, has-children: true, is-leaf: false, is-expanded: true },
+        { title: "Voice channel 1", uid: "91dafa45-c6a2-4d7f-9e29-57751820a032", level: 1, has-children: false, is-leaf: true, is-expanded: false },
+        { title: "Channels", uid: "444257c4-bb60-4c66-a73f-a6c6696bd420", level: 0, has-children: true, is-leaf: false, is-expanded: false },
+    ];
+    in-out property <int> selected-group;
+}
+
+/*
+я изменил структуру для хранения данных веток, и заполняется данными на бэке полностью
+```
+export struct ChatGroupItem {
+    /// идентификатор текущего узла
+    uid: string,
+    /// уровень в иерархии
+    level: int,
+    /// подпись узла
+    title: string,
+    /// количество событий у текущего узла
+    notifies: int,
+    // содержит вложенные узлы
+    has-children: bool,
+    // открыт
+    is-expanded: bool, 
+    // листовой узел, внутри него нет потомков
+    is-leaf: bool,
+    /// иконка узла
+    icon: image,
+}
+
+export global ChatGroupsAdapter {
+    in-out property <[ChatGroupItem]> groups: [
+        { title: "All", uid: "52c6c659-4b8a-4629-8402-355215fd4607", level: 0, has-children: true, is-leaf: false, is-expanded: true, notifies: 21 },
+        { title: "Chats", uid: "e1923a72-5380-4e01-856e-9f12c1402697", level: 1, has-children: true, is-leaf: false, is-expanded: true, notifies: 21 },
+        { title: "Новости", uid: "934bc85d-0f04-4c51-8ba8-87cac576a0aa", level: 2, has-children: false, is-leaf: true, is-expanded: false, notifies: 10 },
+        { title: "РИА Новости", uid: "396d8292-3382-4ee9-a4c9-2fd09662ecce", level: 2, has-children: false, is-leaf: true, is-expanded: false, notifies: 5 },
+        { title: "Инвестиции", uid: "980c3cc5-5a38-46b1-8936-13268d5ef3d6", level: 1, has-children: true, is-leaf: false, is-expanded: true, notifies: 6 },
+        { title: "Bonds", uid: "980c3cc5-5a38-46b1-8936-13268d5ef3d6", level: 2, has-children: false, is-leaf: true, is-expanded: true },
+        { title: "Voices", uid: "bba5188d-2d7a-47df-ada1-b7839ee30f15", level: 0, has-children: true, is-leaf: false, is-expanded: true },
+        { title: "Voice channel 1", uid: "91dafa45-c6a2-4d7f-9e29-57751820a032", level: 1, has-children: false, is-leaf: true, is-expanded: false },
+        { title: "Channels", uid: "444257c4-bb60-4c66-a73f-a6c6696bd420", level: 0, has-children: true, is-leaf: false, is-expanded: false },
+    ];
+    in-out property <int> selected-group;
+}
+```
+весь список  сразу заполняются на бэке отсортирован и со всеми отступами и свойствами узлов, остаётся его только отобразить
+level - обозначает насколько узел отстоит от родительского, например
+узел All - level 0 - он находится в крайнем левом положении
+узел Chats - level 1 - судя по всему принадлежит узлу All , тк All находится выше по списку и имеет параметры 
+has-children: true - имеет потомков
+is-leaf: false - не лист
+is-expanded: true - открытый 
+можно отобразить его как дочерний от All в дереве
+например ветка Channels имеет такие свойства
+- level 0 - самый верхний уровень
+- has-children: true - она имеет потомков, поэтому у неё должны быть кнопка , при нажатии на которую должны появиться следом в списке её дочерние узлы
+- is-leaf: false - она не является листом, т.е это узел в котором могут быть вложенные ветки, поэтому содержит кнопку открытия/закрытия этого узла, состояние кнопки зависит от параметра is-expanded
+- is-expanded: false - она закрыта, то есть следующие в списке узлы к ней не относятся, 
+и так далее
+как это отобразить в slint
+
+все поля уже вычислены на бэке, ничего вычислять не нужно в slint. тем более, что:
+- он не понимает рекурсивные функции, 
+- у него нет предопределения типов, то есть в компоненте или структуре TreeView, он не поймёт поле с типом TreeView
+
+поэтому , я создаю структуру ChatGroupItem со всеми необходимыми для отображения полями, и их все заполняю на бэке (пример я привёл в ChatGroupsAdapter.groups) и расписал как это всё понимать.
+отсюда следует, что вычислять вообще ничего не нужно , всё это плоский список со всеми посчитанными отступами в поле level. все элементы отсортированы в правильном порядке, то есть если есть дочерний элемент, то строго выше него будет или элемент его же уровня, или родительский элемент, это должно гарантироваться на бэке.
+
+мне нужно только отобразить этот список и красиво нарисовать, чтобы он выглядел как tree-view    
+*/

@@ -1,51 +1,26 @@
 import { GroupBox, ComboBox, VerticalBox, GroupBox, GridBox, Palette, TextEdit, Button, Switch, ScrollView, StyleMetrics, ListView } from "std-widgets.slint";
 import { UsecasesPalette, FontSettings } from "../../Styles.slint";
-
-export struct ChatGroupItem {
-    uid: string,
-    parent-uid: string,
-    title: string,
-    notifies: int,
-    icon: image,
-}
-
-export global ChatGroupsAdapter {
-    in-out property <[ChatGroupItem]> groups: [
-        { title: "All", notifies: 200, uid: "52c6c659-4b8a-4629-8402-355215fd4607" },
-        { title: "Chatcs", uid: "e1923a72-5380-4e01-856e-9f12c1402697" },
-        { title: "Новости", uid: "934bc85d-0f04-4c51-8ba8-87cac576a0aa", parent-uid: "e1923a72-5380-4e01-856e-9f12c1402697" },
-        { title: "РИА Новости", uid: "396d8292-3382-4ee9-a4c9-2fd09662ecce", parent-uid: "934bc85d-0f04-4c51-8ba8-87cac576a0aa" },
-        { title: "Инвестиции", uid: "980c3cc5-5a38-46b1-8936-13268d5ef3d6", parent-uid: "934bc85d-0f04-4c51-8ba8-87cac576a0aa" },
-        { title: "Voices", uid: "bba5188d-2d7a-47df-ada1-b7839ee30f15" },
-        { title: "Voice channel 1", uid: "91dafa45-c6a2-4d7f-9e29-57751820a032", parent-uid: "bba5188d-2d7a-47df-ada1-b7839ee30f15" },
-        { title: "Channels", uid: "444257c4-bb60-4c66-a73f-a6c6696bd420" },
-    ];
-    in-out property <int> selected-group;
-}
+import { ChatGroupsAdapter, ChatGroupItem } from "ChatGroupsAdapter.slint";
 
 export component ChatGroupBarItem {
     in property <bool> is-selected;
+    in property <bool> is-leaf;
     in property <string> title <=> text.text;
     in property <string> notifies <=> messages.text;
     in property <image> icon;
-
-    callback select <=> touch-area.clicked; 
-
+    in property <int> depth;
+    callback select <=> touch-area.clicked;
     property <brush> foreground: Palette.foreground;
     property <length> style-min-height: UsecasesPalette.use-material ? 50px : 20px;
     min-height: max(root.style-min-height, layout.min-height);
-
     layout := HorizontalLayout {
         padding-bottom: 2px;
-
         background := Rectangle {
             border-radius: UsecasesPalette.use-material ? 20px : 12px;
-
             HorizontalLayout {
-                padding-left: 8px;
+                padding-left: root.depth * 16px + 8px;
                 padding-right: 8px;
                 spacing: 2px;
-
                 text := Text {
                     color: root.foreground;
                     horizontal-stretch: 1;
@@ -53,7 +28,7 @@ export component ChatGroupBarItem {
                     font-size: FontSettings.body.font-size;
                     font-weight: FontSettings.body.font-weight;
                 }
-            
+
                 messages := Text {
                     color: root.foreground;
                     horizontal-stretch: 0;
@@ -63,12 +38,12 @@ export component ChatGroupBarItem {
                 }
             }
 
-            touch-area := TouchArea {}
+            touch-area := TouchArea { }
         }
     }
 
     states [
-        selected when is-selected : {
+        selected when is-selected: {
             background.background: UsecasesPalette.state-selected;
             foreground: UsecasesPalette.accent-text;
         }
@@ -78,9 +53,7 @@ export component ChatGroupBarItem {
 export component ChatGroupSideBar {
     horizontal-stretch: 0;
     min-width: 100px;
-
     callback selected(ChatGroupItem, int);
-
     VerticalLayout {
         spacing: 4px;
         Rectangle {
@@ -88,15 +61,15 @@ export component ChatGroupSideBar {
             border-radius: UsecasesPalette.use-material ? 0 : 4px;
             border-width: 1px;
             ListView {
-                in-out property <int> selected-item: -1;                
-
+                in-out property <int> selected-item: -1;
                 for item[index] in ChatGroupsAdapter.groups: ChatGroupBarItem {
+                    is-selected: index == selected-item;
+                    is-leaf: item.is-leaf;
                     height: self.min-height;
                     title: item.title;
                     notifies: item.notifies > 0 ? item.notifies : "";
                     icon: item.icon;
-                    is-selected: index == selected-item;
-                    
+                    depth: item.level;
                     select => {
                         selected-item = index;
                         selected(item, index);
