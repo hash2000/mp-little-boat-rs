@@ -1,8 +1,16 @@
 [workspace]
 resolver = "2"
-members = ["little-boat-client", "little-boat-core"]
+members = [
+	"little-boat-client", 
+	"little-boat-core",
+	"little-boat-database"
+]
 
-default-members = ["little-boat-client", "little-boat-core"]
+default-members = [
+	"little-boat-client", 
+	"little-boat-core",
+	"little-boat-database"
+]
 
 [profile.dev]
 opt-level = 0
