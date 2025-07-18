@@ -3,13 +3,13 @@ resolver = "2"
 members = [
 	"little-boat-client", 
 	"little-boat-core",
-	"little-boat-database"
+	"little-boat-db"
 ]
 
 default-members = [
 	"little-boat-client", 
 	"little-boat-core",
-	"little-boat-database"
+	"little-boat-db"
 ]
 
 [profile.dev]
