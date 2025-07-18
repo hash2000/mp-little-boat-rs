@@ -1,7 +1,3 @@
-[submodule "mp-little-boat-database"]
-	path = mp-little-boat-database
-	url = https://github.com/hash2000/mp-little-boat-database.git
-	branch = master
 [submodule "little-boat-database"]
 	path = little-boat-database
 	url = https://github.com/hash2000/mp-little-boat-database.git
