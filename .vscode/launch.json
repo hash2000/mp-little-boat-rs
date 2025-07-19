@@ -6,9 +6,11 @@
             "request": "launch",
             "name": "Debug client",
             "program": "${workspaceFolder}/target/debug/little-boat-client",
-            "args": ["--your-flag", "value"],  // Параметры командной строки
+            "cargo": {
+                "args": ["build", "--features", "poc"]
+            },
             "cwd": "${workspaceFolder}",
             "preLaunchTask": "rust: cargo build"
         }
-    ]
+    ]   
 }

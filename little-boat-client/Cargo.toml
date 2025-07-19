@@ -17,6 +17,13 @@ path = "src/main.rs"
 [dependencies]
 tokio.workspace = true
 slint.workspace = true
+anyhow.workspace = true
 
 [build-dependencies]
 slint-build.workspace = true
+
+[features]
+default=[]
+poc = ["console-ui"]
+slint-ui=[]
+console-ui=[]

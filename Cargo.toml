@@ -40,6 +40,9 @@ encrypted-sled = "0.2.0"
 jsonwebtoken = "9.3.1"
 simd-json = "0.15.1"
 pulldown-cmark = "0.13.0"
+anyhow = "1.0.98"
+
+
 
 [workspace.package]
 version = "0.1.0"
