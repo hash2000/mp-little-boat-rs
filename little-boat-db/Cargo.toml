@@ -12,4 +12,7 @@ repository.workspace = true
 path = "src/lib.rs"
 
 [dependencies]
-
+sled.workspace = true
+encrypted-sled.workspace = true
+jsonwebtoken.workspace = true
+simd-json.workspace = true
