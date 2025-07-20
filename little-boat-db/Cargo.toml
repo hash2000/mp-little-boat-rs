@@ -13,6 +13,11 @@ path = "src/lib.rs"
 
 [dependencies]
 sled.workspace = true
-encrypted-sled.workspace = true
 jsonwebtoken.workspace = true
 simd-json.workspace = true
+anyhow.workspace = true
+chacha20poly1305.workspace = true
+rand.workspace = true
+tempfile.workspace = true
+thiserror.workspace = true
+directories-next.workspace = true

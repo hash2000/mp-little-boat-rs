@@ -21,6 +21,7 @@ anyhow.workspace = true
 
 [build-dependencies]
 slint-build.workspace = true
+little-boat-db = { path = "../little-boat-db" }
 
 [features]
 default=[]
