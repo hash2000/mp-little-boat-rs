@@ -1,3 +1,4 @@
 pub mod errors;
-pub mod database;
 pub mod options_db;
+pub mod database;
+mod database_encrypt;

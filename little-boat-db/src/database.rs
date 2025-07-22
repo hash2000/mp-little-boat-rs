@@ -1,15 +1,17 @@
 use crate::errors::DatabaseError;
+use crate::database_encrypt::{self, Encryptor, NoOpEncryptor};
 use anyhow::{Context, Error, Result};
 use simd_json::base::ValueAsObject;
 use simd_json::derived::ValueObjectAccess;
-use simd_json::{json, to_string, to_vec, value};
-use sled::{Db, IVec};
-use std::f32::consts::E;
+use simd_json::{json, to_vec, value};
+use sled::Db;
 use std::fs::{self, Metadata};
 use std::path::Path;
+use std::sync::Arc;
 
 pub struct Database {
   handler: Db,
+  encryptor: Arc<dyn Encryptor>,
   version: String,
   name: String,
 }
@@ -36,11 +38,14 @@ fn is_sled_db_initialized(path: &Path) -> bool {
 }
 
 impl Database {
-  pub fn new(path: &Path, name: &str) -> Result<Self> {
+  pub fn new(path: &Path, name: &str, encryptor: Option<Arc<dyn Encryptor>>) -> Result<Self> {
     let is_exists = is_sled_db_initialized(path);
     let db = sled::open(path)?;
+    let encryptor = encryptor.unwrap_or_else(|| Arc::new(NoOpEncryptor));
+
     let db = Self {
       handler: db,
+      encryptor,
       version: String::from("0.0.1"),
       name: name.to_string(),
     };
@@ -53,12 +58,13 @@ impl Database {
 
     Ok(db)
   }
-
   
   pub fn get(&self, key: &[u8]) -> Result<Option<Vec<u8>>> {
     match self.handler.get(key) {
       Ok(None) => Ok(None),
-      Ok(Some(value)) => Ok(Some(value.to_vec())),
+      Ok(Some(value)) => {
+        self.encryptor.encrypt(&value).map(Some)
+      },
       Err(e) => Err(e).with_context(|| format!("Failed to read key: {:?} database: {:?}", key, self.name)),
     }
   }
@@ -74,12 +80,17 @@ impl Database {
     }
   }
 
-  pub fn set(&self, key: &[u8], value: &[u8]) -> Result<Option<Vec<u8>>> {
+  pub fn set(&self, key: &[u8], value: &[u8]) -> Result<()> {
+    let value = self.encryptor.encrypt(value)?;
     match self.handler.insert(key, value) {
-      Ok(None) => Ok(None),
-      Ok(Some(new_value)) => Ok(Some(new_value.to_vec())),
+      Ok(_) => Ok(()),
       Err(e) => Err(e).with_context(|| format!("Failed to set key: {:?} database: {:?}", key, self.name)),
     }
+  }
+
+  pub fn set_json(&self, key: &[u8], value: simd_json::OwnedValue) -> Result<()> {
+    let value = to_vec(&value)?;
+    self.set(key, &value)
   }
 
   pub fn contains(&self, key: &[u8]) -> Result<bool> {
@@ -88,6 +99,10 @@ impl Database {
       Err(e) => Err(e).with_context(|| format!("Failed to read key status {:?} database: {:?}", key, self.name))
     }
   }
+}
+
+/// implements metadata methods
+impl Database {
 
   fn append_metadata(&self, name: &str) -> Result<()> {
     let metadata = json!({
@@ -122,15 +137,13 @@ impl Database {
     }?;
 
     if let Some(value) = db_field.as_object() {
-      // TODO: всякие там проверки
+      todo!("any checks of database metadata value");
     } else {
       return Err(DatabaseError::InvalidMetadata(
         name.to_string(),
         String::from("database"),
       ))?;
     }
-
-    Ok(())
   }
 }
 
@@ -142,6 +155,6 @@ mod tests {
   #[test]
   fn tdd_new_database_with_metadata() {
     let dir = tempdir().unwrap();
-    let db = Database::new(dir.path(), "settings").unwrap();
+    let db = Database::new(dir.path(), "settings", None).unwrap();
   }
 }
