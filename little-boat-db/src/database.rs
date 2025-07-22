@@ -1,5 +1,7 @@
+mod encryption;
+
+use crate::database::encryption::{Encryptor, NoOpEncryptor};
 use crate::errors::DatabaseError;
-use crate::database_encrypt::{self, Encryptor, NoOpEncryptor};
 use anyhow::{Context, Error, Result};
 use simd_json::base::ValueAsObject;
 use simd_json::derived::ValueObjectAccess;
