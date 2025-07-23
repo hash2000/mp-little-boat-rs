@@ -3,7 +3,6 @@ mod aes;
 mod chacha20poly1305;
 
 use crate::database::encryption::{Encryptor, NoOpEncryptor};
-use crate::errors::DatabaseError;
 use anyhow::{Context, Result};
 use simd_json::base::ValueAsObject;
 use simd_json::derived::ValueObjectAccess;
@@ -124,7 +123,7 @@ impl Database {
     self
       .handler
       .insert(b"metadata", metadata)?
-      .ok_or(DatabaseError::CreateMetadata(name.to_string()))?;
+      .ok_or(anyhow::anyhow!("Can't create metadata for database [{:?}]", name))?;
 
     Ok(())
   }
@@ -133,24 +132,18 @@ impl Database {
     let mut metadata = self
       .handler
       .get(b"metadata")?
-      .ok_or(DatabaseError::ReadMetadata(name.to_string()))?;
+      .ok_or(anyhow::anyhow!("Can't read metadata from database [{:?}]", name))?;
 
     let metadata = simd_json::to_owned_value(&mut metadata)?;
     let db_field = match metadata.get("database") {
-      None => Err(DatabaseError::InvalidMetadata(
-        name.to_string(),
-        String::from("database"),
-      )),
+      None => Err(anyhow::anyhow!("Invalid metadata for database [{:?}] field [database]", name)),
       Some(value) => Ok(value),
     }?;
 
     if let Some(_) = db_field.as_object() {
       todo!("any checks of database metadata value");
     } else {
-      return Err(DatabaseError::InvalidMetadata(
-        name.to_string(),
-        String::from("database"),
-      ))?;
+      return Err(anyhow::anyhow!("Invalid metadata for database [{:?}] field [database]", name));
     }
   }
 }
