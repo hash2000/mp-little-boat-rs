@@ -1,5 +1,6 @@
 mod encryption;
 mod aes;
+mod chacha20poly1305;
 
 use crate::database::encryption::{Encryptor, NoOpEncryptor};
 use crate::errors::DatabaseError;
