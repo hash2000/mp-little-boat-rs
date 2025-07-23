@@ -1,13 +1,14 @@
 mod encryption;
+mod aes;
 
 use crate::database::encryption::{Encryptor, NoOpEncryptor};
 use crate::errors::DatabaseError;
-use anyhow::{Context, Error, Result};
+use anyhow::{Context, Result};
 use simd_json::base::ValueAsObject;
 use simd_json::derived::ValueObjectAccess;
-use simd_json::{json, to_vec, value};
+use simd_json::{json, to_vec};
 use sled::Db;
-use std::fs::{self, Metadata};
+use std::fs::{self};
 use std::path::Path;
 use std::sync::Arc;
 
@@ -106,6 +107,10 @@ impl Database {
 /// implements metadata methods
 impl Database {
 
+  pub fn get_version(&self) -> Result<String> {
+    Ok(self.version.clone())
+  }
+
   fn append_metadata(&self, name: &str) -> Result<()> {
     let metadata = json!({
       "database": {
@@ -138,7 +143,7 @@ impl Database {
       Some(value) => Ok(value),
     }?;
 
-    if let Some(value) = db_field.as_object() {
+    if let Some(_) = db_field.as_object() {
       todo!("any checks of database metadata value");
     } else {
       return Err(DatabaseError::InvalidMetadata(
@@ -157,6 +162,6 @@ mod tests {
   #[test]
   fn tdd_new_database_with_metadata() {
     let dir = tempdir().unwrap();
-    let db = Database::new(dir.path(), "settings", None).unwrap();
+    let _ = Database::new(dir.path(), "settings", None).unwrap();
   }
 }
