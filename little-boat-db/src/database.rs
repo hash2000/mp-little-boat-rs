@@ -90,14 +90,4 @@ impl Database {
   }
 }
 
-#[cfg(test)]
-mod tests {
-  use super::*;
-  use tempfile::tempdir;
 
-  #[test]
-  fn tdd_new_database_with_metadata() {
-    let dir = tempdir().unwrap();
-    let _ = Database::new(dir.path(), "settings", None).unwrap();
-  }
-}

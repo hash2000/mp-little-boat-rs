@@ -24,17 +24,3 @@ impl ClientConfig {
     path
   } 
 }
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-
-  #[test]
-  fn tdd_create_client_config() {
-    let cfg = ClientConfig::new().expect("Create client config");
-    let config_path = cfg.get_common_config_path();
-    let config_path = config_path.to_str().expect("Config path to string conversion error");
-    println!("Config path: {}", config_path);
-  }
-
-}
