@@ -1,15 +1,14 @@
+mod metadata;
 mod encryption;
 mod aes;
 mod chacha20poly1305;
 
 use crate::database::encryption::{Encryptor, NoOpEncryptor};
+use crate::database::metadata::initialize;
 use anyhow::{Context, Result};
-use simd_json::base::ValueAsObject;
-use simd_json::derived::ValueObjectAccess;
-use simd_json::{json, to_vec};
+use simd_json::to_vec;
 use sled::Db;
-use std::fs::{self};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 pub struct Database {
@@ -17,33 +16,15 @@ pub struct Database {
   encryptor: Arc<dyn Encryptor>,
   version: String,
   name: String,
-}
-
-fn is_sled_db_initialized(path: &Path) -> bool {
-  if !path.exists() || !path.is_dir() {
-    return false;
-  }
-
-  // Sled обычно создаёт файлы с такими расширениями
-  let sled_extensions = ["db", "log", "blob", "conf"];
-
-  match fs::read_dir(path) {
-    Ok(entries) => entries.filter_map(|e| e.ok()).any(|entry| {
-      let path = entry.path();
-      if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
-        sled_extensions.contains(&ext)
-      } else {
-        false
-      }
-    }),
-    Err(_) => false,
-  }
+  path: PathBuf,
 }
 
 impl Database {
   pub fn new(path: &Path, name: &str, encryptor: Option<Arc<dyn Encryptor>>) -> Result<Self> {
-    let is_exists = is_sled_db_initialized(path);
-    let db = sled::open(path)?;
+    let mut path = path.to_path_buf();
+    path.push(name);
+
+    let db = sled::open(&path)?;
     let encryptor = encryptor.unwrap_or_else(|| Arc::new(NoOpEncryptor));
 
     let db = Self {
@@ -51,15 +32,20 @@ impl Database {
       encryptor,
       version: String::from("0.0.1"),
       name: name.to_string(),
+      path: path.to_path_buf(),
     };
 
-    if !is_exists {
-      db.append_metadata(name)?;
-    } else {
-      db.read_metadata(name)?;
-    }
+    initialize(&db, name)?;
 
     Ok(db)
+  }
+
+  pub fn path(&self) -> PathBuf {
+    self.path.clone()
+  }
+
+  pub fn exists(&self) -> bool {
+    true
   }
   
   pub fn get(&self, key: &[u8]) -> Result<Option<Vec<u8>>> {
@@ -100,50 +86,6 @@ impl Database {
     match self.handler.contains_key(key) {
       Ok(new_value) => Ok(new_value),
       Err(e) => Err(e).with_context(|| format!("Failed to read key status {:?} database: {:?}", key, self.name))
-    }
-  }
-}
-
-/// implements metadata methods
-impl Database {
-
-  pub fn get_version(&self) -> Result<String> {
-    Ok(self.version.clone())
-  }
-
-  fn append_metadata(&self, name: &str) -> Result<()> {
-    let metadata = json!({
-      "database": {
-        "name": name,
-        "version": "0.0.1"
-      }
-    });
-
-    let metadata = to_vec(&metadata)?;
-    self
-      .handler
-      .insert(b"metadata", metadata)?
-      .ok_or(anyhow::anyhow!("Can't create metadata for database [{:?}]", name))?;
-
-    Ok(())
-  }
-
-  fn read_metadata(&self, name: &str) -> Result<()> {
-    let mut metadata = self
-      .handler
-      .get(b"metadata")?
-      .ok_or(anyhow::anyhow!("Can't read metadata from database [{:?}]", name))?;
-
-    let metadata = simd_json::to_owned_value(&mut metadata)?;
-    let db_field = match metadata.get("database") {
-      None => Err(anyhow::anyhow!("Invalid metadata for database [{:?}] field [database]", name)),
-      Some(value) => Ok(value),
-    }?;
-
-    if let Some(_) = db_field.as_object() {
-      todo!("any checks of database metadata value");
-    } else {
-      return Err(anyhow::anyhow!("Invalid metadata for database [{:?}] field [database]", name));
     }
   }
 }

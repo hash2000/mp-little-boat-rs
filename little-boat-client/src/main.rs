@@ -1,9 +1,9 @@
-use anyhow::Result;
+use little_boat_core::{run_client_app};
 
 #[cfg(feature = "slint-ui")]
 slint::include_modules!();
 
-fn main() -> Result<()> {
+fn main() -> anyhow::Result<()> {
   #[cfg(feature = "slint-ui")]
   return Ok(main_full_featured()?);
 
@@ -16,7 +16,7 @@ fn main() -> Result<()> {
 
 #[cfg(feature = "slint-ui")]
 #[tokio::main]
-async fn main_full_featured() -> Result<()> {
+async fn main_full_featured() -> anyhow::Result<()> {
   let ui = ApplicationWindow::new()?;
 
   ui.run()?;
@@ -25,6 +25,6 @@ async fn main_full_featured() -> Result<()> {
 
 #[cfg(feature = "console-ui")]
 #[tokio::main]
-async fn main_poc_featured() -> Result<()> {
-  Ok(())
+async fn main_poc_featured() -> anyhow::Result<()> {
+  run_client_app().await
 }

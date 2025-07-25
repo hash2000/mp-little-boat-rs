@@ -15,13 +15,14 @@ name = "little-boat-client"
 path = "src/main.rs"
 
 [dependencies]
+little-boat-db = { path = "../little-boat-db" }
+little-boat-core = { path = "../little-boat-core" }
 tokio.workspace = true
 slint.workspace = true
 anyhow.workspace = true
 
 [build-dependencies]
 slint-build.workspace = true
-little-boat-db = { path = "../little-boat-db" }
 
 [features]
 default=[]

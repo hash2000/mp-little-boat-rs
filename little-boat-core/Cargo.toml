@@ -12,4 +12,6 @@ repository.workspace = true
 path = "src/lib.rs"
 
 [dependencies]
-
+little-boat-db = { path = "../little-boat-db" }
+anyhow.workspace = true
+directories-next.workspace = true
