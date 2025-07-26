@@ -1,17 +1,22 @@
-use crate::database::{self, Database};
+use crate::database::Database;
 use simd_json::base::ValueAsObject;
 use simd_json::derived::ValueObjectAccess;
 use simd_json::{json, to_vec};
 
-const METADATA_VERSION: &'static str = "0.0.1";
+pub const METADATA_VERSION: &'static str = "0.0.1";
 
-pub fn initialize(db: &Database, name: &str) -> anyhow::Result<()> {
+// if a new database has been created, then return the true result
+pub fn initialize(db: &mut Database, name: &str) -> anyhow::Result<()> {
   let read_result = read(db, name);
 
   // metadata isn't read. i'm trying to write new once
   if read_result.is_err() {
     append(db, name)?;
+    // a new database has been initialized
+    db.fresh = true;
   }
+
+  db.fresh = false;
 
   Ok(())
 }

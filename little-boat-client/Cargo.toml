@@ -20,6 +20,8 @@ little-boat-core = { path = "../little-boat-core" }
 tokio.workspace = true
 slint.workspace = true
 anyhow.workspace = true
+simd-json.workspace = true
+
 
 [build-dependencies]
 slint-build.workspace = true

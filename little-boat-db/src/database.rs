@@ -4,7 +4,7 @@ mod aes;
 mod chacha20poly1305;
 
 use crate::database::encryption::{Encryptor, NoOpEncryptor};
-use crate::database::metadata::initialize;
+use crate::database::metadata::{initialize, METADATA_VERSION};
 use anyhow::{Context, Result};
 use simd_json::to_vec;
 use sled::Db;
@@ -17,6 +17,7 @@ pub struct Database {
   version: String,
   name: String,
   path: PathBuf,
+  fresh: bool,
 }
 
 impl Database {
@@ -27,15 +28,16 @@ impl Database {
     let db = sled::open(&path)?;
     let encryptor = encryptor.unwrap_or_else(|| Arc::new(NoOpEncryptor));
 
-    let db = Self {
+    let mut db = Self {
       handler: db,
       encryptor,
-      version: String::from("0.0.1"),
+      version: METADATA_VERSION.to_string(),
       name: name.to_string(),
       path: path.to_path_buf(),
+      fresh: true,
     };
 
-    initialize(&db, name)?;
+    initialize(&mut db, name)?;
 
     Ok(db)
   }
@@ -44,8 +46,13 @@ impl Database {
     self.path.clone()
   }
 
-  pub fn exists(&self) -> bool {
-    true
+  pub fn fresh(&mut self, clear_flag: bool) -> bool {
+    let result = self.fresh;
+    if clear_flag {
+      self.fresh = false;
+    }
+    
+    result
   }
   
   pub fn get(&self, key: &[u8]) -> Result<Option<Vec<u8>>> {

@@ -1,11 +1,12 @@
 mod config;
 
-use crate::config::client::ClientConfig;
-use crate::config::client_init::init_client_config;
+use crate::config::{init_config, Config};
+
 
 pub async fn run_client_app() -> anyhow::Result<()> {
-  let cfg = ClientConfig::new()?;
-  init_client_config(&cfg)?;
+  let mut cfg = Config::new("common")?;
+  init_config(&mut cfg);
+
 
   
   Ok(())
