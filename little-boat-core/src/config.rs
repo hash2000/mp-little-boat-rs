@@ -51,16 +51,16 @@ impl Config {
     })
   }
 
-  pub fn set_str(&self, key: &[u8], value: &str) {
-    let _ = self.db.set(key, value.as_bytes());
+  pub fn set_str(&self, key: &[u8], value: &str) -> anyhow::Result<()> {
+    self.db.set(key, value.as_bytes())
   }
 
   pub fn get_json(&self, key: &[u8]) -> Option<simd_json::OwnedValue> {
     self.db.get_json(key).ok()?
   }
 
-  pub fn set_json(&self, key: &[u8], value: simd_json::OwnedValue) {
-    let _ = self.db.set_json(key, value);
+  pub fn set_json(&self, key: &[u8], value: simd_json::OwnedValue) -> anyhow::Result<()> {
+    self.db.set_json(key, value)
   }
 
   pub fn get_bool(&self, key: &[u8], def: bool) -> bool {
@@ -72,8 +72,38 @@ impl Config {
     })
   }
 
-  pub fn set_bool(&self, key: &[u8], value: bool) {
-    let _ = self.db.set(key, if value { &[1] } else { &[0] });
+  pub fn set_bool(&self, key: &[u8], value: bool) -> anyhow::Result<()> {
+    self.db.set(key, if value { &[1] } else { &[0] })
+  }
+  
+  pub fn get_float(&self, key: &[u8], def: f64) -> f64 {
+      match self.db.get(key) {
+          Ok(Some(bytes)) if bytes.len() == 8 => {
+              bytes.try_into()
+                  .map(f64::from_le_bytes)
+                  .unwrap_or(def)
+          },
+          _ => def,
+      }
+  }
+
+  pub fn set_float(&self, key: &[u8], value: f64) -> anyhow::Result<()> {
+      self.db.set(key, &value.to_le_bytes())
+  }
+
+  pub fn get_int(&self, key: &[u8], def: i64) -> i64 {
+      match self.db.get(key) {
+          Ok(Some(bytes)) if bytes.len() == 8 => {
+              bytes.try_into()
+                  .map(i64::from_le_bytes)
+                  .unwrap_or(def)
+          },
+          _ => def,
+      }
+  }
+
+  pub fn set_int(&self, key: &[u8], value: i64) -> anyhow::Result<()> {
+      self.db.set(key, &value.to_le_bytes())
   }
 
 }

@@ -64,7 +64,15 @@ impl Database {
       Err(e) => Err(e).with_context(|| format!("Failed to read key: {:?} database: {:?}", key, self.name)),
     }
   }
-  
+
+  pub fn set(&self, key: &[u8], value: &[u8]) -> Result<()> {
+    let value = self.encryptor.encrypt(value)?;
+    match self.handler.insert(key, value) {
+      Ok(_) => Ok(()),
+      Err(e) => Err(e).with_context(|| format!("Failed to set key: {:?} database: {:?}", key, self.name)),
+    }
+  }
+
   pub fn get_json(&self, key: &[u8]) -> Result<Option<simd_json::OwnedValue>> {
     match self.get(key)? {
       None => Ok(None),
@@ -73,14 +81,6 @@ impl Database {
           .map_err(|e| anyhow::anyhow!("Failed to parse JSON: {}", e))?;
         Ok(Some(json_value))
       }
-    }
-  }
-
-  pub fn set(&self, key: &[u8], value: &[u8]) -> Result<()> {
-    let value = self.encryptor.encrypt(value)?;
-    match self.handler.insert(key, value) {
-      Ok(_) => Ok(()),
-      Err(e) => Err(e).with_context(|| format!("Failed to set key: {:?} database: {:?}", key, self.name)),
     }
   }
 
