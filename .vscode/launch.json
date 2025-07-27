@@ -4,8 +4,19 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug client",
+            "name": "Debug client (slint)",
             "program": "${workspaceFolder}/target/debug/little-boat-client",
+            "cargo": {
+                "args": ["build", "--features", "poc"]
+            },
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "rust: cargo build"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug client (term)",
+            "program": "${workspaceFolder}/target/debug/little-boat-client-term",
             "cargo": {
                 "args": ["build", "--features", "poc"]
             },

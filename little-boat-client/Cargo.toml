@@ -27,6 +27,6 @@ slint-build.workspace = true
 
 [features]
 default=[]
-poc = ["console-ui"]
+poc = []
 slint-ui=[]
 console-ui=[]

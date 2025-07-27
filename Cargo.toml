@@ -2,12 +2,14 @@
 resolver = "2"
 members = [
 	"little-boat-client", 
+	"little-boat-client-term", 
 	"little-boat-core",
 	"little-boat-db"
 ]
 
 default-members = [
-	"little-boat-client", 
+	"little-boat-client",
+	"little-boat-client-term",
 	"little-boat-core",
 	"little-boat-db"
 ]

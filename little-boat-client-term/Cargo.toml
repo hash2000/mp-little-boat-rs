@@ -1,5 +1,6 @@
 [package]
 name = "little-boat-client-term"
+default-run = "little-boat-client-term"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -8,8 +9,9 @@ rust-version.workspace = true
 categories.workspace = true
 repository.workspace = true
 
-[lib]
-path = "src/lib.rs"
+[[bin]]
+name = "little-boat-client-term"
+path = "src/main.rs"
 
 [dependencies]
 ratatui.workspace = true

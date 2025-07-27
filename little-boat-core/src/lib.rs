@@ -7,8 +7,6 @@ pub async fn run_client_app() -> anyhow::Result<()> {
   init_config(&mut cfg);
 
 
-  #[cfg(feature = "console-ui")]
-  little_boat_client_term::run()?;
 
   Ok(())
 }
