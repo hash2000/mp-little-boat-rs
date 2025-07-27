@@ -29,7 +29,7 @@ impl Config {
   }
 
   pub fn fresh(&mut self, clear_flag: bool) -> bool {
-    self.fresh(clear_flag)
+    self.db.fresh(clear_flag)
   }
 
   pub fn get_config_path(&self) -> PathBuf {

@@ -13,6 +13,13 @@ path = "src/lib.rs"
 
 [dependencies]
 little-boat-db = { path = "../little-boat-db" }
+little-boat-client-term = { path = "../little-boat-client-term", optional = true }
 anyhow.workspace = true
 directories-next.workspace = true
 simd-json.workspace = true
+
+[features]
+default=[]
+poc = ["console-ui"]
+slint-ui=[]
+console-ui=["little-boat-client-term"]

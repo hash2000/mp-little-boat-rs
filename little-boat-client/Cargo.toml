@@ -22,7 +22,6 @@ slint.workspace = true
 anyhow.workspace = true
 simd-json.workspace = true
 
-
 [build-dependencies]
 slint-build.workspace = true
 

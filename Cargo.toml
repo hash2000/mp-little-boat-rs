@@ -22,7 +22,7 @@ codegen-units = 1
 lto = true
 
 [workspace.dependencies]
-tokio = { version = "1.46.1", features = [
+tokio = { version = "1.47.0", features = [
 	"rt",
 	"rt-multi-thread",
 	"io-util",
@@ -47,6 +47,10 @@ thiserror = "2"
 directories-next = "2.0.0"
 aes-gcm = "0.10.3"
 generic-array = "1.2.0"
+
+# terminal UI
+ratatui = "0.29.0"
+crossterm = "0.29.0"
 
 [workspace.package]
 version = "0.1.0"
