@@ -1,29 +1,34 @@
-use crate::app::{App, MessageButton, FocusArea};
+mod frame;
+mod chat_view;
+mod chat_contacts_view;
 
-use anyhow::Result;
-use crossterm::{
-  event::{self, Event, KeyCode, KeyEventKind},
-  execute,
-  terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
+use crate::{application::{Application, FocusArea, MessageButton}, views::frame::centered_rect};
+pub use crate::views::chat_view::ChatView as ChatView;
+pub use crate::views::frame::{
+  DrawnView as DrawnView,
+  FocusedView as FocusedView
 };
+
 use ratatui::{
   Frame, layout::{Constraint, Direction, Layout, Rect},
   style::{Color, Modifier, Style},
   text::{Line, Span},
   widgets::{Block, Borders, List, ListItem, Paragraph},
 };
-use std::{io, vec};
+use std::vec;
 
 
 
-pub fn ui(f: &mut Frame, app: &App) {
+pub fn ui(f: &mut Frame, app: &Application) {
 
+  app.draw(f);
+
+  /*
   let chunks = Layout::default()
     .direction(Direction::Horizontal)
     .constraints([Constraint::Percentage(25), Constraint::Percentage(75)].as_ref())
     .split(f.area());
 
-  // Левая панель - контакты
   let contacts_block = Block::default()
     .title("Контакты")
     .borders(Borders::ALL)
@@ -108,9 +113,9 @@ pub fn ui(f: &mut Frame, app: &App) {
 
   f.render_widget(buttons_paragraph, right_chunks[1]);
 
-  // Диалоговое окно (если нужно)
+  
   if app.show_dialog {
-    let area = centered_rect(60, 20, f.size());
+    let area = centered_rect(60, 20, f.area());
     let block = Block::default()
       .title("Новое сообщение")
       .borders(Borders::ALL);
@@ -119,7 +124,6 @@ pub fn ui(f: &mut Frame, app: &App) {
 
     f.render_widget(input, area);
 
-    // Кнопки OK/Cancel в диалоге
     let buttons_area = Rect {
       x: area.x + area.width - 20,
       y: area.y + area.height - 2,
@@ -140,26 +144,9 @@ pub fn ui(f: &mut Frame, app: &App) {
     ]));
 
     f.render_widget(buttons, buttons_area);
+    
   }
+
+  */
 }
 
-// Вспомогательная функция для центрирования прямоугольника
-fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
-  let popup_layout = Layout::default()
-    .direction(Direction::Vertical)
-    .constraints([
-      Constraint::Percentage((100 - percent_y) / 2),
-      Constraint::Percentage(percent_y),
-      Constraint::Percentage((100 - percent_y) / 2),
-    ])
-    .split(r);
-
-  Layout::default()
-    .direction(Direction::Horizontal)
-    .constraints([
-      Constraint::Percentage((100 - percent_x) / 2),
-      Constraint::Percentage(percent_x),
-      Constraint::Percentage((100 - percent_x) / 2),
-    ])
-    .split(popup_layout[1])[1]
-}

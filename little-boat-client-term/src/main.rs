@@ -1,5 +1,5 @@
 mod views;
-mod app;
+mod application;
 
 use anyhow::Result;
 use crossterm::{
@@ -8,16 +8,12 @@ use crossterm::{
   terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
 use ratatui::{
-  Frame, Terminal,
+  Terminal,
   backend::CrosstermBackend,
-  layout::{Constraint, Direction, Layout, Rect},
-  style::{Color, Modifier, Style},
-  text::{Line, Span},
-  widgets::{Block, Borders, List, ListItem, Paragraph},
 };
-use std::{io, vec};
+use std::io;
 
-use crate::app::{App, MessageButton, FocusArea};
+use crate::application::{Application, MessageButton, FocusArea};
 
 
 pub fn main() -> Result<()> {
@@ -28,12 +24,12 @@ pub fn main() -> Result<()> {
   let backend = CrosstermBackend::new(stdout);
   let mut terminal = Terminal::new(backend)?;
 
-  let mut app = App::new();
-
+  let mut app = Application::new();
 
   loop {
     terminal.draw(|f| views::ui(f, &app))?;
 
+    /*
     if let Event::Key(key) = event::read()? {
       if key.kind == KeyEventKind::Press {
         match key.code {
@@ -90,6 +86,7 @@ pub fn main() -> Result<()> {
         }
       }
     }
+    */
   }
 
   disable_raw_mode()?;
