@@ -1,4 +1,3 @@
-use little_boat_core::{run_client_app};
 
 slint::include_modules!();
 

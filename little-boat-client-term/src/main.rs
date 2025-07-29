@@ -1,5 +1,5 @@
-mod views;
 mod application;
+mod views;
 
 use anyhow::Result;
 use crossterm::{
@@ -7,17 +7,12 @@ use crossterm::{
   execute,
   terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
-use ratatui::{
-  Terminal,
-  backend::CrosstermBackend,
-};
+use ratatui::{Terminal, backend::CrosstermBackend};
 use std::io;
 
-use crate::application::{Application, MessageButton, FocusArea};
-
+use crate::application::Application;
 
 pub fn main() -> Result<()> {
-
   enable_raw_mode()?;
   let mut stdout = io::stdout();
   execute!(stdout, EnterAlternateScreen)?;
@@ -27,66 +22,16 @@ pub fn main() -> Result<()> {
   let mut app = Application::new();
 
   loop {
-    terminal.draw(|f| views::ui(f, &app))?;
+    terminal.draw(|f| views::ui(f, &mut app))?;
 
-    /*
     if let Event::Key(key) = event::read()? {
       if key.kind == KeyEventKind::Press {
         match key.code {
           KeyCode::Char('q') => break,
-          KeyCode::Tab => {
-            app.focus = match app.focus {
-              FocusArea::Contacts => FocusArea::Buttons,
-              FocusArea::Buttons => FocusArea::Contacts,
-              FocusArea::Dialog => FocusArea::Dialog,
-            };
-          }
-          KeyCode::Enter => {
-            if app.focus == FocusArea::Buttons && !app.show_dialog {
-              if app.current_button() == MessageButton::New {
-                app.show_dialog = true;
-                app.focus = FocusArea::Dialog;
-              }
-            } else if app.focus == FocusArea::Dialog {
-              if !app.dialog_input.is_empty() {
-                app.messages.push(app.dialog_input.clone());
-                app.dialog_input.clear();
-              }
-              app.show_dialog = false;
-              app.focus = FocusArea::Buttons;
-            }
-          }
-          KeyCode::Right if app.focus == FocusArea::Buttons => {
-            app.selected_button = app.selected_button.next()
-          }
-          KeyCode::Left if app.focus == FocusArea::Buttons => {
-            app.selected_button = app.selected_button.prev()
-          }
-          KeyCode::Up if app.focus == FocusArea::Contacts => {
-            if app.selected_contact > 0 {
-              app.selected_contact -= 1;
-            }
-          }
-          KeyCode::Down if app.focus == FocusArea::Contacts => {
-            if app.selected_contact < app.contacts.len() - 1 {
-              app.selected_contact += 1;
-            }
-          }
-          KeyCode::Char(c) if app.focus == FocusArea::Dialog => {
-            app.dialog_input.push(c);
-          }
-          KeyCode::Backspace if app.focus == FocusArea::Dialog => {
-            app.dialog_input.pop();
-          }
-          KeyCode::Esc if app.focus == FocusArea::Dialog => {
-            app.show_dialog = false;
-            app.focus = FocusArea::Buttons;
-          }
           _ => {}
         }
       }
     }
-    */
   }
 
   disable_raw_mode()?;

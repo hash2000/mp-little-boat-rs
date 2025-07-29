@@ -1,4 +1,7 @@
-use ratatui::{layout::{Constraint, Direction, Layout, Rect}, Frame};
+use ratatui::{
+  Frame,
+  layout::{Constraint, Direction, Layout, Rect},
+};
 
 pub fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
   let popup_layout = Layout::default()
@@ -20,11 +23,18 @@ pub fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
     .split(popup_layout[1])[1]
 }
 
+pub trait ViewContext {
+
+}
+
 pub trait FocusedView {
   fn set_focus(&mut self, set: bool);
   fn has_focus(&self) -> bool;
 }
 
 pub trait DrawnView {
-  fn draw(&self, f: &mut Frame, area: Rect);
+  fn draw(&self, f: &mut Frame, area: Rect, context: &mut dyn ViewContext);
 }
+
+pub trait View: DrawnView + FocusedView { }
+impl <T: DrawnView + FocusedView> View for T { }

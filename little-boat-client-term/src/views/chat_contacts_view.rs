@@ -1,4 +1,4 @@
-use crate::views::frame::{DrawnView, FocusedView};
+use crate::views::{frame::{DrawnView, FocusedView}, ViewContext};
 use ratatui::{
   Frame,
   layout::Rect,
@@ -17,7 +17,13 @@ impl ChatContactsView {
   pub fn new() -> Self {
     Self {
       focused: false,
-      contacts: Vec::new(),
+      contacts: vec![
+        "Robot Werter".to_string(),
+        "Incapsulacia".to_string(),
+        "XXX Kaban".to_string(),
+        "OgelMogel".to_string(),
+        "Многоярусный Кардинал".to_string(),
+      ],
       selected: 0,
     }
   }
@@ -44,7 +50,7 @@ impl FocusedView for ChatContactsView {
 }
 
 impl DrawnView for ChatContactsView {
-  fn draw(&self, f: &mut Frame, area: Rect) {
+  fn draw(&self, f: &mut Frame, area: Rect, context: &mut dyn ViewContext) {
     let contacts_block = Block::default()
       .title("Contacts")
       .borders(Borders::ALL)

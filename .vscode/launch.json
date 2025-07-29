@@ -21,7 +21,15 @@
                 "args": ["build", "--features", "poc"]
             },
             "cwd": "${workspaceFolder}",
-            "preLaunchTask": "rust: cargo build"
+            "preLaunchTask": "rust: cargo build",
+            "console": "externalTerminal"
         }
+        // {
+        //     "type": "lldb",
+        //     "request": "attach",
+        //     "name": "Attach to client (external)",
+        //     "program": "${workspaceFolder}/target/debug/little-boat-client-term",
+        //     "preLaunchTask": "run-client-term"
+        // }
     ]   
 }
