@@ -1,7 +1,14 @@
 use ratatui::{
   Frame,
-  layout::{Constraint, Direction, Layout, Rect},
+  layout::{
+    Constraint,
+    Direction, 
+    Layout,
+    Rect
+  }
 };
+
+use crossterm::event::Event;
 
 pub fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
   let popup_layout = Layout::default()
@@ -24,7 +31,9 @@ pub fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
 }
 
 pub trait ViewContext {
-
+  fn begin_frame(&mut self);
+  fn append_event(&mut self, event: &Event);
+  fn exit(&self) -> bool;
 }
 
 pub trait FocusedView {
