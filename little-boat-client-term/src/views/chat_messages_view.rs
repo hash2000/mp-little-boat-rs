@@ -1,9 +1,7 @@
 use crate::views::{
-  ViewContext,
-  chat_messages_list_view::ChatMessagesListView,
-  chat_messasge_panel_view::ChatMessagePanelView,
-  frame::{DrawnView, FocusedView},
+  chat_messages_list_view::ChatMessagesListView, chat_messasge_panel_view::ChatMessagePanelView, frame::{DrawnView, EventsHandledView, FocusedView}, ViewContext
 };
+use crossterm::event::Event;
 use ratatui::{
   Frame,
   layout::{Constraint, Direction, Layout, Rect},
@@ -44,4 +42,13 @@ impl DrawnView for ChatMessagesView {
     self.list.draw(f, chunks[0], context);
     self.buttons.draw(f, chunks[1], context);
   }
+}
+
+
+impl EventsHandledView for ChatMessagesView {
+
+  fn handle_event(&mut self, event: &Event) -> bool {
+    true
+  }
+
 }

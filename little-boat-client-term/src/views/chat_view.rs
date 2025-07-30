@@ -1,8 +1,9 @@
 use crate::views::chat_contacts_view::ChatContactsView;
 use crate::views::chat_messages_view::ChatMessagesView;
-use crate::views::frame::{DrawnView, FocusedView};
+use crate::views::frame::{DrawnView, EventsHandledView, FocusedView};
 use crate::views::ViewContext;
 
+use crossterm::event::{Event, KeyCode, KeyEventKind};
 use ratatui::{
   Frame,
   layout::{Constraint, Direction, Layout, Rect},
@@ -48,4 +49,28 @@ impl DrawnView for ChatView {
     self.contacts.draw(f, chunks[0], context);
     self.messages.draw(f, chunks[1], context);
   }
+}
+
+impl EventsHandledView for ChatView {
+
+  fn handle_event(&mut self, event: &Event) -> bool {
+    if let Event::Key(key) = event { 
+      if key.kind == KeyEventKind::Press {
+        match key.code {
+          KeyCode::Tab => {
+            if self.contacts.has_focus() {
+              self.contacts.set_focus(false);
+              self.messages.set_focus(true);
+            } else {
+              self.contacts.set_focus(true);
+              self.messages.set_focus(false);
+            }
+          },
+          _ => ()
+        }
+      }
+    }
+    true
+  }
+
 }

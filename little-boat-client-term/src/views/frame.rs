@@ -1,3 +1,7 @@
+use crate::keymaps::Keymap;
+
+use std::collections::HashSet;
+
 use ratatui::{
   Frame,
   layout::{
@@ -9,6 +13,7 @@ use ratatui::{
 };
 
 use crossterm::event::Event;
+
 
 pub fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
   let popup_layout = Layout::default()
@@ -31,9 +36,7 @@ pub fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
 }
 
 pub trait ViewContext {
-  fn begin_frame(&mut self);
-  fn append_event(&mut self, event: &Event);
-  fn exit(&self) -> bool;
+
 }
 
 pub trait FocusedView {
@@ -45,5 +48,9 @@ pub trait DrawnView {
   fn draw(&self, f: &mut Frame, area: Rect, context: &mut dyn ViewContext);
 }
 
-pub trait View: DrawnView + FocusedView { }
-impl <T: DrawnView + FocusedView> View for T { }
+pub trait EventsHandledView {
+  fn handle_event(&mut self, event: &Event) -> bool;
+}
+
+pub trait View: DrawnView + FocusedView + EventsHandledView { }
+impl <T: DrawnView + FocusedView + EventsHandledView> View for T { }

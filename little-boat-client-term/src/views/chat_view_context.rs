@@ -1,27 +1,20 @@
-use crate::views::frame::ViewContext;
+use crate::{keymaps::Keymap, views::{frame::ViewContext, View}};
 
+use std::collections::HashSet;
 use crossterm::event::Event;
 
 pub struct ChatViewContext {
-
+  keymap: HashSet<Keymap>
 }
 
 impl ChatViewContext {
   pub fn new() -> Self {
-    Self {  }
+    Self { 
+      keymap: HashSet::new()
+    }
   }
 }
 
 impl ViewContext for ChatViewContext {
-  fn begin_frame(&mut self) {
 
-  }
-
-  fn append_event(&mut self, event: &Event) {
-
-  }
-  
-  fn exit(&self) -> bool {
-    false
-  }
 }

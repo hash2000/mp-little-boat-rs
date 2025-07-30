@@ -14,5 +14,6 @@ pub use crate::views::frame::{
   ViewContext as ViewContext,
   DrawnView as DrawnView,
   FocusedView as FocusedView,
+  EventsHandledView as EventsHandledView,
 };
 

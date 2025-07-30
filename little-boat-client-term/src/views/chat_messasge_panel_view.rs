@@ -1,4 +1,5 @@
-use crate::views::{frame::{DrawnView, FocusedView}, ViewContext};
+use crate::views::{frame::{DrawnView, EventsHandledView, FocusedView}, ViewContext};
+use crossterm::event::Event;
 use ratatui::{
   Frame, layout::Rect,
   style::{Color, Modifier, Style},
@@ -50,7 +51,7 @@ pub struct ChatMessagePanelView {
 impl ChatMessagePanelView {
   pub fn new() -> Self {
     Self { 
-      focused: false,
+      focused: true,
       current_button: MessageButton::New
     }
   }
@@ -100,4 +101,14 @@ impl DrawnView for ChatMessagePanelView {
 
     f.render_widget(buttons_paragraph, area);
   }
+}
+
+
+
+impl EventsHandledView for ChatMessagePanelView {
+
+  fn handle_event(&mut self, event: &Event) -> bool {
+    true
+  }
+
 }

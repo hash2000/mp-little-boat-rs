@@ -1,4 +1,5 @@
-use crate::views::{frame::{DrawnView, FocusedView}, ViewContext};
+use crate::views::{frame::{DrawnView, EventsHandledView, FocusedView}, ViewContext};
+use crossterm::event::Event;
 use ratatui::{
   Frame,
   layout::Rect,
@@ -78,4 +79,13 @@ impl DrawnView for ChatContactsView {
 
     f.render_widget(contacts_list, area);
   }
+}
+
+
+impl EventsHandledView for ChatContactsView {
+
+  fn handle_event(&mut self, event: &Event) -> bool {
+    true
+  }
+
 }
