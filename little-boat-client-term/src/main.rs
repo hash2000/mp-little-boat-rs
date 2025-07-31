@@ -1,6 +1,6 @@
 mod application;
+mod services;
 mod views;
-mod keymaps;
 
 use anyhow::Result;
 use crossterm::{
@@ -8,30 +8,41 @@ use crossterm::{
   execute,
   terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
-use ratatui::{backend::CrosstermBackend, Terminal};
-use std::io;
+use ratatui::{Terminal, backend::CrosstermBackend};
+use std::{io, time::Duration};
+use tokio::sync::mpsc;
 
-use crate::application::Application;
+use crate::{application::Application, services::{run_services, ServiceEvent}};
 
-pub fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
   enable_raw_mode()?;
   let mut stdout = io::stdout();
   execute!(stdout, EnterAlternateScreen)?;
   let backend = CrosstermBackend::new(stdout);
   let mut terminal = Terminal::new(backend)?;
 
+  let (tx, mut rx) = mpsc::unbounded_channel::<ServiceEvent>();
+  run_services(tx);
+
   let mut app = Application::new();
 
   loop {
-
     if app.exit() {
       break;
     }
 
+    app.begin_frame();
+
+    while let Ok(event) = rx.try_recv() {
+      app.handle_service_event(&event);
+    }
+
     terminal.draw(|f| app.draw(f))?;
 
-    app.begin_frame();
-    app.append_event(&event::read()?);
+    if crossterm::event::poll(Duration::from_millis(50))? {
+      app.append_event(&event::read()?);
+    }
   }
 
   disable_raw_mode()?;

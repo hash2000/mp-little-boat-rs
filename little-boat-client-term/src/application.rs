@@ -1,4 +1,5 @@
-use crate::views::{ChatBoardView, ChatViewContext, View, ViewContext};
+use crate::views::{ChatBoardView, View};
+use crate::services::{ServiceEvent};
 
 use crossterm::event::{Event, KeyCode, KeyEventKind, KeyModifiers};
 use ratatui::{layout::Rect, Frame};
@@ -6,7 +7,6 @@ use ratatui::{layout::Rect, Frame};
 
 pub struct Application {
   view: Box<dyn View>,
-  view_context: Box<dyn ViewContext>,
   exit: bool
 }
 
@@ -15,13 +15,12 @@ impl Application {
   pub fn new() -> Self {
     Application {
       view: Box::new(ChatBoardView::new()), 
-      view_context: Box::new(ChatViewContext::new()),
       exit: false,
     }
   }
 
   pub fn draw(&mut self, f: &mut Frame) {
-    self.view.draw(f, Rect::ZERO, &mut *self.view_context);
+    self.view.draw(f, Rect::ZERO);
   }
 
   pub fn set_view(&mut self, view: Box<dyn View>) {
@@ -30,7 +29,10 @@ impl Application {
 
   pub fn begin_frame(&mut self) {
     
-    
+  }
+
+  pub fn handle_service_event(&mut self, event: &ServiceEvent) {
+    self.view.handle_service_event(event);
   }
 
   pub fn append_event(&mut self, event: &Event) {

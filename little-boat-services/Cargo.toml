@@ -1,5 +1,5 @@
 [package]
-name = "little-boat-core"
+name = "little-boat-services"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -12,8 +12,4 @@ repository.workspace = true
 path = "src/lib.rs"
 
 [dependencies]
-little-boat-db = { path = "../little-boat-db" }
-anyhow.workspace = true
-directories-next.workspace = true
-simd-json.workspace = true
-
+tokio.workspace = true

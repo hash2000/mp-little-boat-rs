@@ -4,8 +4,7 @@ use crate::views::{
     chat_messasge_panel_view::ChatMessagePanelView,
   },
   DrawnView, 
-  FocusedView, 
-  ViewContext,
+  FocusedView,
   EventsHandledView  
 };
 use crossterm::event::Event;
@@ -45,14 +44,14 @@ impl FocusedView for ChatMessagesView {
 }
 
 impl DrawnView for ChatMessagesView {
-  fn draw(&self, f: &mut Frame, area: Rect, context: &mut dyn ViewContext) {
+  fn draw(&self, f: &mut Frame, area: Rect) {
     let chunks = Layout::default()
       .direction(Direction::Vertical)
       .constraints([Constraint::Percentage(80), Constraint::Percentage(20)].as_ref())
       .split(area);
 
-    self.list.draw(f, chunks[0], context);
-    self.buttons.draw(f, chunks[1], context);
+    self.list.draw(f, chunks[0]);
+    self.buttons.draw(f, chunks[1]);
   }
 }
 

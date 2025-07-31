@@ -14,7 +14,11 @@ name = "little-boat-client-term"
 path = "src/main.rs"
 
 [dependencies]
+little-boat-service-chat = { path = "../little-boat-service-chat" }
+little-boat-db = { path = "../little-boat-db" }
+little-boat-core = { path = "../little-boat-core" }
 ratatui.workspace = true
 crossterm.workspace = true
 anyhow.workspace = true
+tokio.workspace = true
 

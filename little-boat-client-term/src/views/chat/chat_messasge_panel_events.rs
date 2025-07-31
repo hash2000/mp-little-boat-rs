@@ -1,12 +1,17 @@
-use crate::views::{
+use crate::{services::ServiceEvent, views::{
   chat::chat_messasge_panel_view::ChatMessagePanelView, 
   EventsHandledView,
   FocusedView,
-};
+}};
 
 use crossterm::event::{Event, KeyCode, KeyEventKind};
 
 impl EventsHandledView for ChatMessagePanelView {
+
+  fn handle_service_event(&mut self, event: &ServiceEvent) {
+    
+  }
+
   fn handle_event(&mut self, event: &Event) -> bool {
     if !self.has_focus() {
       return false;

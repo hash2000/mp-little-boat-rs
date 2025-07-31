@@ -1,4 +1,4 @@
-use crate::views::{DrawnView, FocusedView, ViewContext};
+use crate::views::{DrawnView, FocusedView};
 use ratatui::{
   Frame,
   layout::Rect,
@@ -35,7 +35,7 @@ impl FocusedView for ChatMessagesListView {
 }
 
 impl DrawnView for ChatMessagesListView {
-  fn draw(&self, f: &mut Frame, area: Rect, ccontext: &mut dyn ViewContext) {
+  fn draw(&self, f: &mut Frame, area: Rect) {
     let messages_block = Block::default().title("Messages").borders(Borders::ALL);
     let messages_text = self.messages.join("\n");
     let messages_paragraph = Paragraph::new(messages_text).block(messages_block);

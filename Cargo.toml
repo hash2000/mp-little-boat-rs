@@ -7,13 +7,6 @@ members = [
 	"little-boat-db"
 ]
 
-default-members = [
-	"little-boat-client",
-	"little-boat-client-term",
-	"little-boat-core",
-	"little-boat-db"
-]
-
 [profile.dev]
 opt-level = 0
 debug = true
@@ -25,20 +18,13 @@ lto = true
 
 [workspace.dependencies]
 tokio = { version = "1.47.0", features = [
-	"rt",
-	"rt-multi-thread",
-	"io-util",
-	"io-std",
-	"time",
-	"process",
-	"macros",
-	"fs",
-	"parking_lot",
+	"full"
 ] }
 slint = "1.12.1"
 slint-build = "1.12.1"
 sled = "0.34.7"
 jsonwebtoken = "9.3.1"
+webrtc = "0.13.0"
 simd-json = "0.15.1"
 pulldown-cmark = "0.13.0"
 anyhow = "1.0.98"

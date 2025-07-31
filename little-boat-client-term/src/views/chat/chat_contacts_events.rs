@@ -1,10 +1,15 @@
 use crossterm::event::{Event, KeyCode, KeyEventKind};
 
-use crate::views::{ChatBoardView, EventsHandledView, FocusedView};
+use crate::services::ServiceEvent;
+use crate::views::{EventsHandledView, FocusedView};
 use crate::views::{chat::chat_contacts_view::ChatContactsView};
 
 
 impl EventsHandledView for ChatContactsView {
+  
+  fn handle_service_event(&mut self, event: &ServiceEvent) {
+    
+  }
 
   fn handle_event(&mut self, event: &Event) -> bool {
     if !self.has_focus() {

@@ -1,5 +1,5 @@
 [package]
-name = "little-boat-core"
+name = "little-boat-service-chat"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -12,8 +12,8 @@ repository.workspace = true
 path = "src/lib.rs"
 
 [dependencies]
+little-boat-services = { path = "../little-boat-services"}
 little-boat-db = { path = "../little-boat-db" }
-anyhow.workspace = true
-directories-next.workspace = true
-simd-json.workspace = true
-
+little-boat-core = { path = "../little-boat-core" }
+tokio.workspace = true
+webrtc.workspace = true

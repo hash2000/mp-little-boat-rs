@@ -1,4 +1,4 @@
-use crate::views::{DrawnView, FocusedView, ViewContext};
+use crate::views::{DrawnView, FocusedView};
 use ratatui::{
   Frame, layout::Rect,
   style::{Color, Modifier, Style},
@@ -80,7 +80,7 @@ impl FocusedView for ChatMessagePanelView {
 }
 
 impl DrawnView for ChatMessagePanelView {
-  fn draw(&self, f: &mut Frame, area: Rect, context: &mut dyn ViewContext) {
+  fn draw(&self, f: &mut Frame, area: Rect) {
     let buttons_block = Block::default()
       .borders(Borders::ALL)
       .style(

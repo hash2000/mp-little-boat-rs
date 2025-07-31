@@ -1,4 +1,4 @@
-use crate::views::{DrawnView, FocusedView, ViewContext};
+use crate::views::{DrawnView, FocusedView};
 
 use ratatui::{
   Frame,
@@ -72,7 +72,7 @@ impl FocusedView for ChatContactsView {
 }
 
 impl DrawnView for ChatContactsView {
-  fn draw(&self, f: &mut Frame, area: Rect, context: &mut dyn ViewContext) {
+  fn draw(&self, f: &mut Frame, area: Rect) {
     let contacts_block = Block::default()
       .title("Contacts")
       .borders(Borders::ALL)

@@ -1,4 +1,4 @@
-use crate::views::{EventsHandledView, ViewContext, DrawnView, FocusedView};
+use crate::views::{EventsHandledView, DrawnView, FocusedView};
 use crate::views::chat::chat_contacts_view::ChatContactsView;
 use crate::views::chat::chat_messages_view::ChatMessagesView;
 
@@ -49,7 +49,7 @@ impl FocusedView for ChatBoardView {
 }
 
 impl DrawnView for ChatBoardView {
-  fn draw(&self, f: &mut Frame, _: Rect, context: &mut dyn ViewContext) {
+  fn draw(&self, f: &mut Frame, _: Rect) {
     // rects of the chat view area
     // - left rect - contacts
     // - right rect - devided into two
@@ -60,7 +60,7 @@ impl DrawnView for ChatBoardView {
       .constraints([Constraint::Percentage(25), Constraint::Percentage(75)].as_ref())
       .split(f.area());
 
-    self.contacts.draw(f, chunks[0], context);
-    self.messages.draw(f, chunks[1], context);
+    self.contacts.draw(f, chunks[0]);
+    self.messages.draw(f, chunks[1]);
   }
 }
