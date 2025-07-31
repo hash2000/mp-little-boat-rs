@@ -3,11 +3,10 @@ use crate::views::{
     chat_messages_list_view::ChatMessagesListView, 
     chat_messasge_panel_view::ChatMessagePanelView,
   },
-  frame::{
-    DrawnView, 
-    FocusedView, 
-    ViewContext,
-  }, EventsHandledView  
+  DrawnView, 
+  FocusedView, 
+  ViewContext,
+  EventsHandledView  
 };
 use crossterm::event::Event;
 use ratatui::{

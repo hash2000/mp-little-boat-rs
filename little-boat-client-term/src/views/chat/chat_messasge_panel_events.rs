@@ -1,10 +1,10 @@
-use crossterm::event::{Event, KeyCode, KeyEventKind};
-
-use crate::views::frame::FocusedView;
 use crate::views::{
   chat::chat_messasge_panel_view::ChatMessagePanelView, 
-  frame::EventsHandledView,
+  EventsHandledView,
+  FocusedView,
 };
+
+use crossterm::event::{Event, KeyCode, KeyEventKind};
 
 impl EventsHandledView for ChatMessagePanelView {
   fn handle_event(&mut self, event: &Event) -> bool {

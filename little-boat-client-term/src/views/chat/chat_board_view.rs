@@ -1,7 +1,6 @@
-use crate::views::{EventsHandledView, ViewContext};
+use crate::views::{EventsHandledView, ViewContext, DrawnView, FocusedView};
 use crate::views::chat::chat_contacts_view::ChatContactsView;
 use crate::views::chat::chat_messages_view::ChatMessagesView;
-use crate::views::frame::{DrawnView, FocusedView};
 
 use crossterm::event::Event;
 use ratatui::{

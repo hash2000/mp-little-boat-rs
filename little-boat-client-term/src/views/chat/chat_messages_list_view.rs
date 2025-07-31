@@ -1,4 +1,4 @@
-use crate::views::{frame::{DrawnView, FocusedView}, ViewContext};
+use crate::views::{DrawnView, FocusedView, ViewContext};
 use ratatui::{
   Frame,
   layout::Rect,

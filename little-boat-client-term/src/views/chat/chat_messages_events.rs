@@ -1,12 +1,12 @@
-use crossterm::event::Event;
-
-use crate::views::frame::FocusedView;
 use crate::views::{
   chat::chat_messages_view::{
     ChatMessagesView
   }, 
-  frame::EventsHandledView
+  EventsHandledView,
+  FocusedView
 };
+
+use crossterm::event::Event;
 
 impl EventsHandledView for ChatMessagesView {
 

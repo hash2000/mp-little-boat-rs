@@ -1,11 +1,10 @@
-use crate::views::{frame::{DrawnView, FocusedView}, ViewContext};
+use crate::views::{DrawnView, FocusedView, ViewContext};
 use ratatui::{
   Frame, layout::Rect,
   style::{Color, Modifier, Style},
   text::{Line, Span},
   widgets::{Block, Borders, Paragraph},
 };
-
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum MessageButtonType {
