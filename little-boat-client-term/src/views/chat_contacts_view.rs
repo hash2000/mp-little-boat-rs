@@ -80,12 +80,3 @@ impl DrawnView for ChatContactsView {
     f.render_widget(contacts_list, area);
   }
 }
-
-
-impl EventsHandledView for ChatContactsView {
-
-  fn handle_event(&mut self, event: &Event) -> bool {
-    true
-  }
-
-}

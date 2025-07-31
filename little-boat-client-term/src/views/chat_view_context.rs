@@ -1,7 +1,6 @@
-use crate::{keymaps::Keymap, views::{frame::ViewContext, View}};
+use crate::{keymaps::Keymap, views::frame::ViewContext};
 
 use std::collections::HashSet;
-use crossterm::event::Event;
 
 pub struct ChatViewContext {
   keymap: HashSet<Keymap>

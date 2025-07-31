@@ -1,4 +1,4 @@
-use crate::views::{ChatView, ChatViewContext, View, ViewContext};
+use crate::views::{ChatBoardView, ChatViewContext, View, ViewContext};
 
 use crossterm::event::{Event, KeyCode, KeyEventKind, KeyModifiers};
 use ratatui::{layout::Rect, Frame};
@@ -14,7 +14,7 @@ pub struct Application {
 impl Application {
   pub fn new() -> Self {
     Application {
-      view: Box::new(ChatView::new()), 
+      view: Box::new(ChatBoardView::new()), 
       view_context: Box::new(ChatViewContext::new()),
       exit: false,
     }

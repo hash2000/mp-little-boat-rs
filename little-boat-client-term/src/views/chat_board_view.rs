@@ -1,29 +1,38 @@
+use crate::views::ViewContext;
 use crate::views::chat_contacts_view::ChatContactsView;
 use crate::views::chat_messages_view::ChatMessagesView;
-use crate::views::frame::{DrawnView, EventsHandledView, FocusedView};
-use crate::views::ViewContext;
+use crate::views::frame::{DrawnView, FocusedView};
 
-use crossterm::event::{Event, KeyCode, KeyEventKind};
 use ratatui::{
   Frame,
   layout::{Constraint, Direction, Layout, Rect},
 };
 
-pub struct ChatView {
+pub struct ChatBoardView {
   contacts: ChatContactsView,
   messages: ChatMessagesView,
 }
 
-impl ChatView {
+impl ChatBoardView {
   pub fn new() -> Self {
     Self {
       contacts: ChatContactsView::new(),
       messages: ChatMessagesView::new(),
     }
   }
+
+  pub fn swap_focus(&mut self) {
+    if self.contacts.has_focus() {
+      self.contacts.set_focus(false);
+      self.messages.set_focus(true);
+    } else {
+      self.contacts.set_focus(true);
+      self.messages.set_focus(false);
+    }
+  }
 }
 
-impl FocusedView for ChatView {
+impl FocusedView for ChatBoardView {
   fn set_focus(&mut self, set: bool) {
     self.contacts.set_focus(set);
     self.messages.set_focus(set);
@@ -34,7 +43,7 @@ impl FocusedView for ChatView {
   }
 }
 
-impl DrawnView for ChatView {
+impl DrawnView for ChatBoardView {
   fn draw(&self, f: &mut Frame, _: Rect, context: &mut dyn ViewContext) {
     // rects of the chat view area
     // - left rect - contacts
@@ -49,28 +58,4 @@ impl DrawnView for ChatView {
     self.contacts.draw(f, chunks[0], context);
     self.messages.draw(f, chunks[1], context);
   }
-}
-
-impl EventsHandledView for ChatView {
-
-  fn handle_event(&mut self, event: &Event) -> bool {
-    if let Event::Key(key) = event { 
-      if key.kind == KeyEventKind::Press {
-        match key.code {
-          KeyCode::Tab => {
-            if self.contacts.has_focus() {
-              self.contacts.set_focus(false);
-              self.messages.set_focus(true);
-            } else {
-              self.contacts.set_focus(true);
-              self.messages.set_focus(false);
-            }
-          },
-          _ => ()
-        }
-      }
-    }
-    true
-  }
-
 }

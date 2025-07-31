@@ -102,13 +102,3 @@ impl DrawnView for ChatMessagePanelView {
     f.render_widget(buttons_paragraph, area);
   }
 }
-
-
-
-impl EventsHandledView for ChatMessagePanelView {
-
-  fn handle_event(&mut self, event: &Event) -> bool {
-    true
-  }
-
-}

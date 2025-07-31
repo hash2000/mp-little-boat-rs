@@ -1,6 +1,3 @@
-use crate::keymaps::Keymap;
-
-use std::collections::HashSet;
 
 use ratatui::{
   Frame,
@@ -52,5 +49,14 @@ pub trait EventsHandledView {
   fn handle_event(&mut self, event: &Event) -> bool;
 }
 
-pub trait View: DrawnView + FocusedView + EventsHandledView { }
-impl <T: DrawnView + FocusedView + EventsHandledView> View for T { }
+pub trait View :
+  DrawnView + 
+  FocusedView + 
+  EventsHandledView 
+{ }
+
+impl <T> View for T where T : 
+  DrawnView + 
+  FocusedView + 
+  EventsHandledView
+{ }

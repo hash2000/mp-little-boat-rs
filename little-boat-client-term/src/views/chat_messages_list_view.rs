@@ -43,11 +43,3 @@ impl DrawnView for ChatMessagesListView {
   }
 }
 
-
-impl EventsHandledView for ChatMessagesListView {
-
-  fn handle_event(&mut self, event: &Event) -> bool {
-    true
-  }
-
-}
