@@ -1,8 +1,7 @@
-use crate::views::{frame::{DrawnView, EventsHandledView, FocusedView}, ViewContext};
-use crossterm::event::Event;
+use crate::views::{frame::{DrawnView, FocusedView}, ViewContext};
 use ratatui::{
   Frame,
-  layout::{Constraint, Direction, Layout, Rect},
+  layout::Rect,
   widgets::{Block, Borders, Paragraph},
 };
 
@@ -22,14 +21,16 @@ impl ChatMessagesListView {
       focused: false
     }
   }
+
 }
 
 impl FocusedView for ChatMessagesListView {
   fn set_focus(&mut self, set: bool) {
+    self.focused = set;
   }
 
   fn has_focus(&self) -> bool {
-    false
+    self.focused
   }
 }
 

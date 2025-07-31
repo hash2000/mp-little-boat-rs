@@ -1,5 +1,4 @@
-use crate::views::{frame::{DrawnView, EventsHandledView, FocusedView}, ViewContext};
-use crossterm::event::Event;
+use crate::views::{frame::{DrawnView, FocusedView}, ViewContext};
 use ratatui::{
   Frame,
   layout::Rect,
@@ -38,6 +37,27 @@ impl ChatContactsView {
       self.selected = index;
     }
   }
+
+  pub fn select_next(&mut self) {
+    self.selected += 1;
+    if self.selected > self.contacts.len() - 1 {
+      self.selected = 0;
+    }
+  }
+
+  pub fn select_prev(&mut self) {
+    if self.selected == 0 {
+      self.selected = self.contacts.len() - 1;
+    }
+    else {
+      self.selected -= 1;
+    }
+  }
+
+  pub fn choose_current(&self) {
+
+  }
+
 }
 
 impl FocusedView for ChatContactsView {

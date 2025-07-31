@@ -8,7 +8,7 @@ use crossterm::{
   execute,
   terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
-use ratatui::{backend::CrosstermBackend, Frame, Terminal};
+use ratatui::{backend::CrosstermBackend, Terminal};
 use std::io;
 
 use crate::application::Application;

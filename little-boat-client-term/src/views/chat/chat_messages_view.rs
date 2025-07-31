@@ -1,5 +1,13 @@
 use crate::views::{
-  chat_messages_list_view::ChatMessagesListView, chat_messasge_panel_view::ChatMessagePanelView, frame::{DrawnView, EventsHandledView, FocusedView}, ViewContext
+  chat::{
+    chat_messages_list_view::ChatMessagesListView, 
+    chat_messasge_panel_view::ChatMessagePanelView,
+  },
+  frame::{
+    DrawnView, 
+    FocusedView, 
+    ViewContext,
+  }, EventsHandledView  
 };
 use crossterm::event::Event;
 use ratatui::{
@@ -18,6 +26,11 @@ impl ChatMessagesView {
       list: ChatMessagesListView::new(),
       buttons: ChatMessagePanelView::new(),
     }
+  }
+
+  pub fn pool_event(&mut self, event: &Event) -> bool {
+    self.list.handle_event(event) || 
+    self.buttons.handle_event(event)
   }
 }
 

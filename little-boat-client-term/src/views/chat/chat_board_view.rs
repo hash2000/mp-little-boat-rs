@@ -1,8 +1,9 @@
-use crate::views::ViewContext;
-use crate::views::chat_contacts_view::ChatContactsView;
-use crate::views::chat_messages_view::ChatMessagesView;
+use crate::views::{EventsHandledView, ViewContext};
+use crate::views::chat::chat_contacts_view::ChatContactsView;
+use crate::views::chat::chat_messages_view::ChatMessagesView;
 use crate::views::frame::{DrawnView, FocusedView};
 
+use crossterm::event::Event;
 use ratatui::{
   Frame,
   layout::{Constraint, Direction, Layout, Rect},
@@ -29,6 +30,11 @@ impl ChatBoardView {
       self.contacts.set_focus(true);
       self.messages.set_focus(false);
     }
+  }
+
+  pub fn pool_event(&mut self, event: &Event) -> bool {
+    self.contacts.handle_event(event) ||
+    self.messages.handle_event(event)
   }
 }
 
