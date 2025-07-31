@@ -21,7 +21,7 @@ impl EventsHandledView for ChatMessagePanelView {
         self.select_prev_button();
       }
 
-      if key.kind == KeyEventKind::Release && (key.code == KeyCode::Enter || key.code == KeyCode::Char(' ')) {
+      if key.kind == KeyEventKind::Press && (key.code == KeyCode::Enter || key.code == KeyCode::Char(' ')) {
         self.process_current_button();
       }
     }

@@ -5,7 +5,6 @@
 			"label": "rust: cargo build",
 			"type": "cargo",
 			"command": "build",
-			"args": ["--features", "poc"],
 			"problemMatcher": [
 				"$rustc"
 			],
@@ -18,7 +17,7 @@
             "label": "rust: cargo clippy",
             "type": "shell",
             "command": "cargo",
-            "args": ["clippy", "--features", "poc"],
+            "args": ["clippy"],
             "group": "build",
             "problemMatcher": ["$rustc"],
             "presentation": {

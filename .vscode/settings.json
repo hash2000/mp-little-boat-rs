@@ -5,7 +5,5 @@
     "editor.insertSpaces": true,
     "editor.detectIndentation": false
   },
-  "rust-analyzer.cargo.features": [
-    "poc"
-  ],
+  "rust-analyzer.cargo.features": [ ],
 }

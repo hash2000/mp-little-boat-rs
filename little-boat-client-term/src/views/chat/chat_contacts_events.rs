@@ -20,7 +20,7 @@ impl EventsHandledView for ChatContactsView {
         self.select_prev();
       }
 
-      if key.kind == KeyEventKind::Release && (key.code == KeyCode::Enter || key.code == KeyCode::Char(' ')) {
+      if key.kind == KeyEventKind::Press && (key.code == KeyCode::Enter || key.code == KeyCode::Char(' ')) {
         self.choose_current();
       }
     }

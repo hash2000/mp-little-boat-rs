@@ -24,9 +24,3 @@ simd-json.workspace = true
 
 [build-dependencies]
 slint-build.workspace = true
-
-[features]
-default=[]
-poc = []
-slint-ui=[]
-console-ui=[]
