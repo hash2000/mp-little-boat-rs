@@ -8,9 +8,7 @@ pub struct OptionsDb {
 
 impl OptionsDb {
   pub fn new(path: &Path, name: &str) -> Result<Self> {
-    let db = OptionsDb {
-      db: Database::new(path, name, None)?,
-    };
+    let db = OptionsDb { db: Database::new(path, name, None)? };
 
     Ok(db)
   }

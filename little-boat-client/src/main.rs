@@ -1,4 +1,3 @@
-
 slint::include_modules!();
 
 #[tokio::main]

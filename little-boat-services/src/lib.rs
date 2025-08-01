@@ -1,4 +1,1 @@
-
-pub struct ServiceEvent {
-  
-}
+pub struct ServiceEvent {}

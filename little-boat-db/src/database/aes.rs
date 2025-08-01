@@ -49,10 +49,7 @@ impl Encryptor for AesEncryptor {
     }
 
     let nonce = GenericArray::from_slice(&data[..12]);
-    self
-      .cipher
-      .decrypt(nonce, &data[12..])
-      .map_err(|e| anyhow::anyhow!("Decryption failed: {}", e))
+    self.cipher.decrypt(nonce, &data[12..]).map_err(|e| anyhow::anyhow!("Decryption failed: {}", e))
   }
 }
 

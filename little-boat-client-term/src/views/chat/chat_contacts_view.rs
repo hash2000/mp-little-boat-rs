@@ -49,16 +49,12 @@ impl ChatContactsView {
   pub fn select_prev(&mut self) {
     if self.selected == 0 {
       self.selected = self.contacts.len() - 1;
-    }
-    else {
+    } else {
       self.selected -= 1;
     }
   }
 
-  pub fn choose_current(&self) {
-
-  }
-
+  pub fn choose_current(&self) {}
 }
 
 impl FocusedView for ChatContactsView {
@@ -76,11 +72,7 @@ impl DrawnView for ChatContactsView {
     let contacts_block = Block::default()
       .title("Contacts")
       .borders(Borders::ALL)
-      .style(Style::default().fg(if self.has_focus() {
-        Color::Yellow
-      } else {
-        Color::White
-      }));
+      .style(Style::default().fg(if self.has_focus() { Color::Yellow } else { Color::White }));
 
     let contacts: Vec<ListItem> = self
       .contacts

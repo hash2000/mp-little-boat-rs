@@ -1,44 +1,36 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"label": "rust: cargo build",
-			"type": "cargo",
-			"command": "build",
-			"problemMatcher": [
-				"$rustc"
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-		},
-		{
-            "label": "rust: cargo clippy",
-            "type": "shell",
-            "command": "cargo",
-            "args": ["clippy"],
-            "group": "build",
-            "problemMatcher": ["$rustc"],
-            "presentation": {
-                "reveal": "always",
-                "panel": "dedicated"
-            }
-		},
-		{
-            "label": "run-client-term",
-            "type": "shell",
-            "command": "${workspaceFolder}/target/debug/little-boat-client-term",
-            "isBackground": true,
-            "problemMatcher": [],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "presentation": {
-                "reveal": "always",
-                "panel": "new",
-                "focus": true
-            }
-        }
-	]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "rust: cargo build",
+      "type": "process",
+      "command": "cargo",
+      "args": [
+        "build"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [
+        "$rustc"
+      ]
+    },
+    {
+      "label": "rust: cargo clippy",
+      "type": "shell",
+      "command": "cargo",
+      "args": [
+        "clippy"
+      ],
+      "group": "build",
+      "problemMatcher": [
+        "$rustc"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    }
+  ]
 }

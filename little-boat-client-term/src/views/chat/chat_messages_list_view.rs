@@ -13,15 +13,10 @@ pub struct ChatMessagesListView {
 impl ChatMessagesListView {
   pub fn new() -> Self {
     Self {
-      messages: vec![
-        "Привет!".to_string(),
-        "Как дела?".to_string(),
-        "Что нового?".to_string(),
-      ],
-      focused: false
+      messages: vec!["Привет!".to_string(), "Как дела?".to_string(), "Что нового?".to_string()],
+      focused: false,
     }
   }
-
 }
 
 impl FocusedView for ChatMessagesListView {
@@ -43,4 +38,3 @@ impl DrawnView for ChatMessagesListView {
     f.render_widget(messages_paragraph, area);
   }
 }
-

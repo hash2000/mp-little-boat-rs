@@ -22,10 +22,10 @@ pub fn initialize(db: &mut Database, name: &str) -> anyhow::Result<()> {
 }
 
 fn read(db: &Database, name: &str) -> anyhow::Result<()> {
-  let mut metadata = db.handler.get(b"metadata")?.ok_or(anyhow::anyhow!(
-    "Can't read metadata from database '{:?}'",
-    name
-  ))?;
+  let mut metadata = db
+    .handler
+    .get(b"metadata")?
+    .ok_or(anyhow::anyhow!("Can't read metadata from database '{:?}'", name))?;
 
   let metadata = simd_json::to_owned_value(&mut metadata)?;
   let Some(database_f) = metadata.get("database") else {
@@ -84,10 +84,7 @@ fn append(db: &Database, name: &str) -> anyhow::Result<()> {
   let metadata = to_vec(&metadata)?;
   db.handler
     .insert(b"metadata", metadata)?
-    .ok_or(anyhow::anyhow!(
-      "Can't create metadata for database [{:?}]",
-      name
-    ))?;
+    .ok_or(anyhow::anyhow!("Can't create metadata for database [{:?}]", name))?;
 
   Ok(())
 }

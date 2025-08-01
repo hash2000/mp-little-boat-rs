@@ -2,34 +2,28 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Debug client slint (LLDB)",
+            "preLaunchTask": "rust: cargo build",
             "type": "lldb",
             "request": "launch",
-            "name": "Debug client (slint)",
             "program": "${workspaceFolder}/target/debug/little-boat-client",
-            "cargo": {
-                "args": ["build"]
-            },
             "cwd": "${workspaceFolder}",
-            "preLaunchTask": "rust: cargo build"
+            "args": [
+                "${workspaceFolder}little-boat-client/src/main.rs"
+            ],
         },
         {
+            "name": "Debug client term (LLDB)",
+            "preLaunchTask": "rust: cargo build",
             "type": "lldb",
             "request": "launch",
-            "name": "Debug client (term)",
+            "console": "externalTerminal",
             "program": "${workspaceFolder}/target/debug/little-boat-client-term",
-            "cargo": {
-                "args": ["build"]
-            },
             "cwd": "${workspaceFolder}",
-            "preLaunchTask": "rust: cargo build",
-            "console": "externalTerminal"
+            "args": [
+                "${workspaceFolder}little-boat-client-term/src/main.rs"
+            ],
         }
-        // {
-        //     "type": "lldb",
-        //     "request": "attach",
-        //     "name": "Attach to client (external)",
-        //     "program": "${workspaceFolder}/target/debug/little-boat-client-term",
-        //     "preLaunchTask": "run-client-term"
-        // }
+
     ]   
 }

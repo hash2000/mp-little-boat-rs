@@ -21,11 +21,7 @@ impl Config {
 
     let db = Database::new(&conf_path, name, None)?;
 
-    Ok(Self {
-      project_dir,
-      db,
-      conf_path,
-    })
+    Ok(Self { project_dir, db, conf_path })
   }
 
   pub fn fresh(&mut self, clear_flag: bool) -> bool {
@@ -46,8 +42,7 @@ impl Config {
 
   pub fn get_str(&self, key: &[u8], def: &str) -> String {
     self.db.get(key).map_or(def.to_string(), |v| {
-      v.map(|bytes| String::from_utf8_lossy(&bytes).into_owned())
-        .unwrap_or(def.to_string())
+      v.map(|bytes| String::from_utf8_lossy(&bytes).into_owned()).unwrap_or(def.to_string())
     })
   }
 
@@ -65,45 +60,37 @@ impl Config {
 
   pub fn get_bool(&self, key: &[u8], def: bool) -> bool {
     self.db.get(key).map_or(def, |v| {
-      v
-        .and_then(|bytes| bytes.first().copied())
-        .map(|byte| byte == 1)
-        .unwrap_or(def)
+      v.and_then(|bytes| bytes.first().copied()).map(|byte| byte == 1).unwrap_or(def)
     })
   }
 
   pub fn set_bool(&self, key: &[u8], value: bool) -> anyhow::Result<()> {
     self.db.set(key, if value { &[1] } else { &[0] })
   }
-  
+
   pub fn get_float(&self, key: &[u8], def: f64) -> f64 {
-      match self.db.get(key) {
-          Ok(Some(bytes)) if bytes.len() == 8 => {
-              bytes.try_into()
-                  .map(f64::from_le_bytes)
-                  .unwrap_or(def)
-          },
-          _ => def,
+    match self.db.get(key) {
+      Ok(Some(bytes)) if bytes.len() == 8 => {
+        bytes.try_into().map(f64::from_le_bytes).unwrap_or(def)
       }
+      _ => def,
+    }
   }
 
   pub fn set_float(&self, key: &[u8], value: f64) -> anyhow::Result<()> {
-      self.db.set(key, &value.to_le_bytes())
+    self.db.set(key, &value.to_le_bytes())
   }
 
   pub fn get_int(&self, key: &[u8], def: i64) -> i64 {
-      match self.db.get(key) {
-          Ok(Some(bytes)) if bytes.len() == 8 => {
-              bytes.try_into()
-                  .map(i64::from_le_bytes)
-                  .unwrap_or(def)
-          },
-          _ => def,
+    match self.db.get(key) {
+      Ok(Some(bytes)) if bytes.len() == 8 => {
+        bytes.try_into().map(i64::from_le_bytes).unwrap_or(def)
       }
+      _ => def,
+    }
   }
 
   pub fn set_int(&self, key: &[u8], value: i64) -> anyhow::Result<()> {
-      self.db.set(key, &value.to_le_bytes())
+    self.db.set(key, &value.to_le_bytes())
   }
-
 }

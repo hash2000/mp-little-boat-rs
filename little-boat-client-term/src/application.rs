@@ -2,21 +2,16 @@ use crate::views::{ChatBoardView, View};
 
 use crossterm::event::{Event, KeyCode, KeyEventKind, KeyModifiers};
 use little_boat_services::ServiceEvent;
-use ratatui::{layout::Rect, Frame};
-
+use ratatui::{Frame, layout::Rect};
 
 pub struct Application {
   view: Box<dyn View>,
-  exit: bool
+  exit: bool,
 }
-
 
 impl Application {
   pub fn new() -> Self {
-    Application {
-      view: Box::new(ChatBoardView::new()), 
-      exit: false,
-    }
+    Application { view: Box::new(ChatBoardView::new()), exit: false }
   }
 
   pub fn draw(&mut self, f: &mut Frame) {
@@ -27,9 +22,7 @@ impl Application {
     self.view = view;
   }
 
-  pub fn begin_frame(&mut self) {
-    
-  }
+  pub fn begin_frame(&mut self) {}
 
   pub fn handle_service_event(&mut self, event: &ServiceEvent) {
     self.view.handle_service_event(event);
@@ -39,10 +32,12 @@ impl Application {
     if let Event::Key(key) = event {
       if key.kind == KeyEventKind::Press {
         match key.code {
-          KeyCode::Char('q') => if key.modifiers.contains(KeyModifiers::CONTROL) {
-            self.exit = true 
-          },
-          _ => ()
+          KeyCode::Char('q') => {
+            if key.modifiers.contains(KeyModifiers::CONTROL) {
+              self.exit = true
+            }
+          }
+          _ => (),
         }
       }
     }

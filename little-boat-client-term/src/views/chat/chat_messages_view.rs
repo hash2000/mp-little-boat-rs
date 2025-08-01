@@ -1,11 +1,8 @@
 use crate::views::{
+  DrawnView, EventsHandledView, FocusedView,
   chat::{
-    chat_messages_list_view::ChatMessagesListView, 
-    chat_messasge_panel_view::ChatMessagePanelView,
+    chat_messages_list_view::ChatMessagesListView, chat_messasge_panel_view::ChatMessagePanelView,
   },
-  DrawnView, 
-  FocusedView,
-  EventsHandledView  
 };
 use crossterm::event::Event;
 use ratatui::{
@@ -20,15 +17,11 @@ pub struct ChatMessagesView {
 
 impl ChatMessagesView {
   pub fn new() -> Self {
-    Self {
-      list: ChatMessagesListView::new(),
-      buttons: ChatMessagePanelView::new(),
-    }
+    Self { list: ChatMessagesListView::new(), buttons: ChatMessagePanelView::new() }
   }
 
   pub fn pool_event(&mut self, event: &Event) -> bool {
-    self.list.handle_event(event) || 
-    self.buttons.handle_event(event)
+    self.list.handle_event(event) || self.buttons.handle_event(event)
   }
 }
 
@@ -54,4 +47,3 @@ impl DrawnView for ChatMessagesView {
     self.buttons.draw(f, chunks[1]);
   }
 }
-

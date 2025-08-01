@@ -1,6 +1,6 @@
-use crate::views::{EventsHandledView, DrawnView, FocusedView};
 use crate::views::chat::chat_contacts_view::ChatContactsView;
 use crate::views::chat::chat_messages_view::ChatMessagesView;
+use crate::views::{DrawnView, EventsHandledView, FocusedView};
 
 use crossterm::event::Event;
 use ratatui::{
@@ -15,10 +15,7 @@ pub struct ChatBoardView {
 
 impl ChatBoardView {
   pub fn new() -> Self {
-    Self {
-      contacts: ChatContactsView::new(),
-      messages: ChatMessagesView::new(),
-    }
+    Self { contacts: ChatContactsView::new(), messages: ChatMessagesView::new() }
   }
 
   pub fn swap_focus(&mut self) {
@@ -32,8 +29,7 @@ impl ChatBoardView {
   }
 
   pub fn pool_event(&mut self, event: &Event) -> bool {
-    self.contacts.handle_event(event) ||
-    self.messages.handle_event(event)
+    self.contacts.handle_event(event) || self.messages.handle_event(event)
   }
 }
 

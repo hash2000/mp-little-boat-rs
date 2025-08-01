@@ -1,16 +1,11 @@
 mod chat;
 
-pub use crate::views::chat::ChatBoardView as ChatBoardView;
+pub use crate::views::chat::ChatBoardView;
 
 use little_boat_services::ServiceEvent;
 use ratatui::{
   Frame,
-  layout::{
-    Constraint,
-    Direction, 
-    Layout,
-    Rect
-  }
+  layout::{Constraint, Direction, Layout, Rect},
 };
 
 use crossterm::event::Event;
@@ -49,14 +44,6 @@ pub trait EventsHandledView {
   fn handle_event(&mut self, event: &Event) -> bool;
 }
 
-pub trait View :
-  DrawnView + 
-  FocusedView + 
-  EventsHandledView 
-{ }
+pub trait View: DrawnView + FocusedView + EventsHandledView {}
 
-impl <T> View for T where T : 
-  DrawnView + 
-  FocusedView + 
-  EventsHandledView
-{ }
+impl<T> View for T where T: DrawnView + FocusedView + EventsHandledView {}

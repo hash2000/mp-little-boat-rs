@@ -1,6 +1,7 @@
 use crate::views::{DrawnView, FocusedView};
 use ratatui::{
-  Frame, layout::Rect,
+  Frame,
+  layout::Rect,
   style::{Color, Modifier, Style},
   text::{Line, Span},
   widgets::{Block, Borders, Paragraph},
@@ -14,7 +15,7 @@ pub enum MessageButtonType {
 }
 
 pub struct MessageButton {
-  button_type: MessageButtonType
+  button_type: MessageButtonType,
 }
 
 impl MessageButton {
@@ -41,15 +42,12 @@ impl MessageButton {
 
 pub struct ChatMessagePanelView {
   focused: bool,
-  current_button: MessageButton
+  current_button: MessageButton,
 }
 
 impl ChatMessagePanelView {
   pub fn new() -> Self {
-    Self { 
-      focused: true,
-      current_button: MessageButton::new()
-    }
+    Self { focused: true, current_button: MessageButton::new() }
   }
 
   pub fn select_next_button(&mut self) {
@@ -60,9 +58,7 @@ impl ChatMessagePanelView {
     self.current_button.prev();
   }
 
-  pub fn process_current_button(&self) {
-    
-  }
+  pub fn process_current_button(&self) {}
 
   pub fn current_button_type(&self) -> MessageButtonType {
     self.current_button.button_type
@@ -83,31 +79,28 @@ impl DrawnView for ChatMessagePanelView {
   fn draw(&self, f: &mut Frame, area: Rect) {
     let buttons_block = Block::default()
       .borders(Borders::ALL)
-      .style(
-        Style::default().fg(if self.has_focus() {
-          Color::Yellow
-        } else {
-          Color::White
-        }),
-      );
+      .style(Style::default().fg(if self.has_focus() { Color::Yellow } else { Color::White }));
 
-    let button_new_style = if self.has_focus() && self.current_button_type() == MessageButtonType::New {
-      Style::default().add_modifier(Modifier::REVERSED)
-    } else {
-      Style::default()
-    };
-    
-    let button_edit_style = if self.has_focus() && self.current_button_type() == MessageButtonType::Edit {
-      Style::default().add_modifier(Modifier::REVERSED)
-    } else {
-      Style::default()
-    };
+    let button_new_style =
+      if self.has_focus() && self.current_button_type() == MessageButtonType::New {
+        Style::default().add_modifier(Modifier::REVERSED)
+      } else {
+        Style::default()
+      };
 
-    let button_send_style = if self.has_focus() && self.current_button_type() == MessageButtonType::Send {
-      Style::default().add_modifier(Modifier::REVERSED)
-    } else {
-      Style::default()
-    };
+    let button_edit_style =
+      if self.has_focus() && self.current_button_type() == MessageButtonType::Edit {
+        Style::default().add_modifier(Modifier::REVERSED)
+      } else {
+        Style::default()
+      };
+
+    let button_send_style =
+      if self.has_focus() && self.current_button_type() == MessageButtonType::Send {
+        Style::default().add_modifier(Modifier::REVERSED)
+      } else {
+        Style::default()
+      };
 
     let buttons = vec![Line::from(vec![
       Span::styled(" New ", button_new_style),
@@ -117,9 +110,8 @@ impl DrawnView for ChatMessagePanelView {
       Span::styled(" Send ", button_send_style),
     ])];
 
-    let buttons_paragraph = Paragraph::new(buttons)
-      .block(buttons_block)
-      .alignment(ratatui::layout::Alignment::Center);
+    let buttons_paragraph =
+      Paragraph::new(buttons).block(buttons_block).alignment(ratatui::layout::Alignment::Center);
 
     f.render_widget(buttons_paragraph, area);
   }

@@ -1,10 +1,10 @@
-mod metadata;
-mod encryption;
 mod aes;
 mod chacha20poly1305;
+mod encryption;
+mod metadata;
 
 use crate::database::encryption::{Encryptor, NoOpEncryptor};
-use crate::database::metadata::{initialize, METADATA_VERSION};
+use crate::database::metadata::{METADATA_VERSION, initialize};
 use anyhow::{Context, Result};
 use simd_json::to_vec;
 use sled::Db;
@@ -51,17 +51,17 @@ impl Database {
     if clear_flag {
       self.fresh = false;
     }
-    
+
     result
   }
-  
+
   pub fn get(&self, key: &[u8]) -> Result<Option<Vec<u8>>> {
     match self.handler.get(key) {
       Ok(None) => Ok(None),
-      Ok(Some(value)) => {
-        self.encryptor.encrypt(&value).map(Some)
-      },
-      Err(e) => Err(e).with_context(|| format!("Failed to read key: {:?} database: {:?}", key, self.name)),
+      Ok(Some(value)) => self.encryptor.encrypt(&value).map(Some),
+      Err(e) => {
+        Err(e).with_context(|| format!("Failed to read key: {:?} database: {:?}", key, self.name))
+      }
     }
   }
 
@@ -69,7 +69,9 @@ impl Database {
     let value = self.encryptor.encrypt(value)?;
     match self.handler.insert(key, value) {
       Ok(_) => Ok(()),
-      Err(e) => Err(e).with_context(|| format!("Failed to set key: {:?} database: {:?}", key, self.name)),
+      Err(e) => {
+        Err(e).with_context(|| format!("Failed to set key: {:?} database: {:?}", key, self.name))
+      }
     }
   }
 
@@ -92,9 +94,8 @@ impl Database {
   pub fn contains(&self, key: &[u8]) -> Result<bool> {
     match self.handler.contains_key(key) {
       Ok(new_value) => Ok(new_value),
-      Err(e) => Err(e).with_context(|| format!("Failed to read key status {:?} database: {:?}", key, self.name))
+      Err(e) => Err(e)
+        .with_context(|| format!("Failed to read key status {:?} database: {:?}", key, self.name)),
     }
   }
 }
-
-

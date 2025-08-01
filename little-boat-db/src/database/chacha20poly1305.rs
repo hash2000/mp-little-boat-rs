@@ -59,8 +59,6 @@ impl Encryptor for ChaChaEncryptor {
   }
 }
 
-
-
 #[cfg(test)]
 mod tests {
   use super::*;
