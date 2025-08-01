@@ -1,8 +1,8 @@
 mod chat;
 
-use crate::services::ServiceEvent;
 pub use crate::views::chat::ChatBoardView as ChatBoardView;
 
+use little_boat_services::ServiceEvent;
 use ratatui::{
   Frame,
   layout::{

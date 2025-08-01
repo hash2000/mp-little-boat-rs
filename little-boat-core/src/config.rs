@@ -2,7 +2,7 @@ mod defaults;
 
 use directories_next::ProjectDirs;
 use little_boat_db::database::Database;
-use std::{iter::Copied, path::PathBuf};
+use std::path::PathBuf;
 
 pub use defaults::init_config;
 

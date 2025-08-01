@@ -14,6 +14,5 @@ path = "src/lib.rs"
 [dependencies]
 little-boat-services = { path = "../little-boat-services"}
 little-boat-db = { path = "../little-boat-db" }
-little-boat-core = { path = "../little-boat-core" }
 tokio.workspace = true
 webrtc.workspace = true

@@ -1,10 +1,13 @@
-use crate::{services::ServiceEvent, views::{
-  chat::chat_messages_view::ChatMessagesView, 
-  EventsHandledView,
-  FocusedView
-}};
+use crate::{
+  views::{
+    chat::chat_messages_view::ChatMessagesView, 
+    EventsHandledView,
+    FocusedView
+  }
+};
 
 use crossterm::event::Event;
+use little_boat_services::ServiceEvent;
 
 impl EventsHandledView for ChatMessagesView {
   

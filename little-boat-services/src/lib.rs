@@ -1,4 +1,4 @@
 
-pub fn empty() {
+pub struct ServiceEvent {
   
 }

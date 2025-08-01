@@ -1,7 +1,7 @@
 use crate::views::{ChatBoardView, View};
-use crate::services::{ServiceEvent};
 
 use crossterm::event::{Event, KeyCode, KeyEventKind, KeyModifiers};
+use little_boat_services::ServiceEvent;
 use ratatui::{layout::Rect, Frame};
 
 

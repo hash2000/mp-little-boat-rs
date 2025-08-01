@@ -1,6 +1,7 @@
-use crossterm::event::{Event, KeyCode, KeyEventKind};
+use crate::{views::{ChatBoardView, EventsHandledView, FocusedView}};
+use little_boat_services::ServiceEvent;
 
-use crate::{services::ServiceEvent, views::{ChatBoardView, EventsHandledView, FocusedView}};
+use crossterm::event::{Event, KeyCode, KeyEventKind};
 
 impl EventsHandledView for ChatBoardView {
 

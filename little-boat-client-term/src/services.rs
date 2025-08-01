@@ -1,13 +1,9 @@
-mod webrtc_service;
+use little_boat_services::ServiceEvent;
 
 use tokio::sync::mpsc;
 
-use crate::services::webrtc_service::run_webrtc_service;
 
-pub struct ServiceEvent {
-  
-}
 
 pub fn run_services(tx: mpsc::UnboundedSender<ServiceEvent>) {
-  run_webrtc_service(tx);
+//  run_webrtc_service(tx);
 }
