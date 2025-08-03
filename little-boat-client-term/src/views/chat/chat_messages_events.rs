@@ -1,7 +1,7 @@
 use crate::views::{EventsHandledView, FocusedView, chat::chat_messages_view::ChatMessagesView};
 
 use crossterm::event::Event;
-use little_boat_services::ServiceEvent;
+use little_boat_abstractions::ServiceEvent;
 
 impl EventsHandledView for ChatMessagesView {
   fn handle_service_event(&mut self, event: &ServiceEvent) {}

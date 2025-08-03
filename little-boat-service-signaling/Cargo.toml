@@ -1,5 +1,5 @@
 [package]
-name = "little-boat-services"
+name = "little-boat-service-signaling"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -12,4 +12,8 @@ repository.workspace = true
 path = "src/lib.rs"
 
 [dependencies]
+little-boat-abstractions = { path = "../little-boat-abstractions"}
 tokio.workspace = true
+webrtc.workspace = true
+futures.workspace = true
+tokio-tungstenite.workspace = true

@@ -1,7 +1,7 @@
 use crate::views::{ChatBoardView, View};
 
 use crossterm::event::{Event, KeyCode, KeyEventKind, KeyModifiers};
-use little_boat_services::ServiceEvent;
+use little_boat_abstractions::ServiceEvent;
 use ratatui::{Frame, layout::Rect};
 
 pub struct Application {

@@ -15,7 +15,7 @@ path = "src/main.rs"
 
 [dependencies]
 little-boat-core = { path = "../little-boat-core" }
-little-boat-services = { path = "../little-boat-services" }
+little-boat-abstractions = { path = "../little-boat-abstractions" }
 ratatui.workspace = true
 crossterm.workspace = true
 anyhow.workspace = true

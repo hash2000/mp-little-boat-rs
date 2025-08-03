@@ -13,7 +13,9 @@ path = "src/lib.rs"
 
 [dependencies]
 little-boat-db = { path = "../little-boat-db" }
+little-boat-abstractions = { path = "../little-boat-abstractions" }
+little-boat-service-signaling = { path = "../little-boat-service-signaling"}
 anyhow.workspace = true
 directories-next.workspace = true
 simd-json.workspace = true
-
+tokio.workspace = true

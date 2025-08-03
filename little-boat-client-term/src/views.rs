@@ -2,7 +2,7 @@ mod chat;
 
 pub use crate::views::chat::ChatBoardView;
 
-use little_boat_services::ServiceEvent;
+use little_boat_abstractions::ServiceEvent;
 use ratatui::{
   Frame,
   layout::{Constraint, Direction, Layout, Rect},

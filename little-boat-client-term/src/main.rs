@@ -8,7 +8,7 @@ use crossterm::{
   execute,
   terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
 };
-use little_boat_services::ServiceEvent;
+use little_boat_abstractions::ServiceEvent;
 use ratatui::{Terminal, backend::CrosstermBackend};
 use std::{io, time::Duration};
 use tokio::sync::mpsc;

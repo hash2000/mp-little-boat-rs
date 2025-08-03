@@ -3,7 +3,7 @@ use crate::views::{
 };
 
 use crossterm::event::{Event, KeyCode, KeyEventKind};
-use little_boat_services::ServiceEvent;
+use little_boat_abstractions::ServiceEvent;
 
 impl EventsHandledView for ChatMessagePanelView {
   fn handle_service_event(&mut self, event: &ServiceEvent) {}

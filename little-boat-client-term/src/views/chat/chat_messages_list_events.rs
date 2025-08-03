@@ -1,5 +1,5 @@
 use crossterm::event::{Event, KeyCode, KeyEventKind};
-use little_boat_services::ServiceEvent;
+use little_boat_abstractions::ServiceEvent;
 
 use crate::views::chat::chat_messages_list_view::ChatMessagesListView;
 use crate::views::{ChatBoardView, EventsHandledView, FocusedView};
