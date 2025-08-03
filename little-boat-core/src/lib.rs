@@ -6,9 +6,10 @@ use tokio::sync::mpsc::Receiver;
 use little_boat_abstractions::ControlEvent;
 
 use crate::{
-  config::{Config, init_config},
+  config::Config,
   services::ServiceManager,
 };
+
 
 pub struct ClientApp {
   // local database with all configurations 
@@ -19,10 +20,10 @@ pub struct ClientApp {
 }
 
 pub async fn run_client_app() -> anyhow::Result<()> {
-  let mut cfg = Config::new("common")?;
-  init_config(&mut cfg);
+  let mut cfg = Box::new(Config::new("common")?);
+  //init_config(&mut cfg);
 
-  let service_manager = ServiceManager::new(&cfg);
+  let service_manager = ServiceManager::new(cfg);
   //service_manage
 
 

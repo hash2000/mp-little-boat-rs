@@ -1,5 +1,5 @@
 
-pub trait IConfigReader {
+pub trait IConfigReader : Send + Sync {
 
   fn has_flag(&self, key: &[u8], def: bool) -> bool;
 
@@ -14,7 +14,7 @@ pub trait IConfigReader {
   fn get_int(&self, key: &[u8], def: usize) -> usize;
 }
 
-pub trait IConfigWriter {
+pub trait IConfigWriter : Send + Sync {
 
   fn set_flag(&self, key: &[u8]);
 

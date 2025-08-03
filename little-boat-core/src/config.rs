@@ -5,8 +5,6 @@ use little_boat_abstractions::{IConfigReader, IConfigWriter};
 use little_boat_db::database::Database;
 use std::path::PathBuf;
 
-pub use defaults::init_config;
-
 pub struct Config {
   project_dir: ProjectDirs,
   db: Database,

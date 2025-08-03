@@ -2,8 +2,11 @@ mod services;
 mod config;
 
 pub use crate::services::{
+  SystemEvent,
   ControlEvent,
   ServiceEvent,
+  SignalingEvent,
+  ChatEvent,
   ServiceEventMessage,
   IService,
 };

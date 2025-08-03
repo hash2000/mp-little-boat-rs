@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
 use tokio::sync::broadcast;
 
 use crate::IConfigReader;
@@ -16,8 +17,32 @@ pub struct ServiceEventMessage {
   pub message: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum ChatEvent {
+    MessageReceived { from: String, content: String },
+    UserJoined { user: String },
+    UserLeft { user: String },
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum SystemEvent {
+    ServiceStarted { name: String },
+    ServiceStopped { name: String },
+    Error { service: String, message: String },
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum SignalingEvent {
+    ClientConnected { client_id: String },
+    ClientDisconnected { client_id: String },
+    MessageForwarded { from: String, to: String },
+}
+
 #[derive(Debug, Clone)]
 pub enum ServiceEvent {
+  Signaling(SignalingEvent),
+  Chat(ChatEvent),
+  System(SystemEvent),
   Status(ServiceEventMessage),
   Error(ServiceEventMessage)
 }
@@ -29,6 +54,6 @@ pub trait IService: Send + Sync {
         &self,
         service_tx: broadcast::Sender<ServiceEvent>,
         control_rx: broadcast::Receiver<ControlEvent>,
-        config: &dyn IConfigReader,
+        config: Box<dyn IConfigReader>,
     ) -> anyhow::Result<tokio::task::JoinHandle<anyhow::Result<()>>>;
 }

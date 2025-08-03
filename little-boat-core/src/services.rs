@@ -14,7 +14,7 @@ pub struct ServiceManager {
 }
 
 impl ServiceManager {
-  pub fn new(cfg: &dyn IConfigReader) -> Self {
+  pub fn new(cfg: Box<dyn IConfigReader>) -> Self {
     let channel_capacity = cfg.get_int(b"service-manager.broadcast.channel.capacity", 100);
 
     let (service_tx, _) = broadcast::channel(channel_capacity);
@@ -27,7 +27,7 @@ impl ServiceManager {
       registered_services: Vec::new(),
     };
 
-    manager.register(Box::new(little_boat_service_signaling::SignalingService));
+    //manager.register(Box::new(little_boat_service_signaling::SignalingService));
     manager
   }
 
@@ -35,7 +35,7 @@ impl ServiceManager {
     self.registered_services.push(service);
   }
 
-  pub async fn start(&mut self, name: &str, cfg: &dyn IConfigReader) -> anyhow::Result<()> {
+  pub async fn start(&mut self, name: &str, cfg: Box<dyn IConfigReader>) -> anyhow::Result<()> {
     if self.services.contains_key(name) {
       little_boat_abstractions::log_info!("service-manager", "Service {} already started", name);
       return Ok(());
