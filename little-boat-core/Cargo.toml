@@ -19,3 +19,5 @@ anyhow.workspace = true
 directories-next.workspace = true
 simd-json.workspace = true
 tokio.workspace = true
+log.workspace = true
+env_logger.workspace = true

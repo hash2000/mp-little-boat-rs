@@ -1,6 +1,8 @@
-use little_boat_abstractions::ServiceEvent;
+use anyhow::Context;
+use async_trait::async_trait;
+use little_boat_abstractions::{ControlEvent, IConfigReader, IService, ServiceEvent};
 use tokio::net::ToSocketAddrs;
-use tokio::sync::mpsc;
+use tokio::sync::{broadcast, mpsc};
 
 use futures::{SinkExt, StreamExt};
 use std::collections::HashMap;
@@ -23,34 +25,35 @@ type Peers = Arc<
   >,
 >;
 
-pub struct SignalingServiceConfig {
-  addr: String,
-}
+pub struct SignalingService;
 
-impl SignalingServiceConfig {
-  pub fn new() -> Self {
-    Self { addr: "127.0.0.1:8080".to_string() }
+#[async_trait]
+impl IService for SignalingService {
+  fn name(&self) -> &'static str {
+    "signaling"
   }
 
-  pub fn addr(&self) -> String {
-    self.addr.clone()
+  async fn start(
+    &self,
+    service_tx: broadcast::Sender<ServiceEvent>,
+    control_rx: broadcast::Receiver<ControlEvent>,
+    config: &dyn IConfigReader,
+  ) -> anyhow::Result<tokio::task::JoinHandle<anyhow::Result<()>>> {
+    let service_name = self.name().to_string();
+    let handle = tokio::spawn(async move {
+      little_boat_abstractions::log_info!(service_name, "Starting signaling service");
+
+      // let host = config.get_str(b"service.signaling.host", "127.0.0.1");
+      // let port: u64 = config.get_int(b"service.signaling.port", 8080) as u64;
+      // let addr = format!("{}:{}", host, port);
+
+      // let listener = tokio::net::TcpListener::bind(&addr)
+      //   .await
+      //   .context(format!("Failed to bind to {}", addr))?;
+
+      Ok(())
+    });
+
+    Ok(handle)
   }
-}
-
-pub fn run_service(tx: mpsc::UnboundedSender<ServiceEvent>, config: SignalingServiceConfig) {
-  tokio::spawn(async move {
-    // let listener = match tokio::net::TcpListener::bind(config.addr()).await {
-    //   Err(e) => {
-    //     //let _ = tx.send(ServiceEvent::Error(e));
-    //     return;
-    //   }
-    //   Ok(value) => value,
-    // };
-
-    // let peers: Peers = Arc::new(Mutex::new(HashMap::new()));
-
-    // while let Ok((stream, _)) = listener.accept().await {
-    //   let peers = Arc::clone(&peers);
-    // }
-  });
 }

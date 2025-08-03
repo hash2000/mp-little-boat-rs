@@ -1,58 +1,101 @@
-mod signaling;
-
-use little_boat_abstractions::{ControlEvent, IConfigReader, ServiceEvent};
+use little_boat_abstractions::{ControlEvent, IConfigReader, IService, ServiceEvent};
 use std::collections::HashMap;
-use tokio::sync::{broadcast, mpsc};
-
-use crate::{config::Config, services::signaling::start_signaling_service};
+use tokio::sync::broadcast;
 
 struct ServiceHandle {
-  handle: tokio::task::JoinHandle<()>,
+  handle: tokio::task::JoinHandle<anyhow::Result<()>>,
 }
 
 pub struct ServiceManager {
-  service_tx: mpsc::UnboundedSender<ServiceEvent>,
+  service_tx: broadcast::Sender<ServiceEvent>,
   control_tx: broadcast::Sender<ControlEvent>,
   services: HashMap<String, ServiceHandle>,
+  registered_services: Vec<Box<dyn IService>>,
 }
 
 impl ServiceManager {
   pub fn new(cfg: &dyn IConfigReader) -> Self {
     let channel_capacity = cfg.get_int(b"service-manager.broadcast.channel.capacity", 100);
 
-    let (service_tx, _) = mpsc::unbounded_channel();
+    let (service_tx, _) = broadcast::channel(channel_capacity);
     let (control_tx, _) = broadcast::channel(channel_capacity);
 
-    let manager =
-      ServiceManager { service_tx, control_tx: control_tx.clone(), services: HashMap::new() };
+    let mut manager = ServiceManager {
+      service_tx,
+      control_tx: control_tx.clone(),
+      services: HashMap::new(),
+      registered_services: Vec::new(),
+    };
 
+    manager.register(Box::new(little_boat_service_signaling::SignalingService));
     manager
   }
 
-  pub fn start(&mut self, name: &str, cfg: &Config) {
+  pub fn register(&mut self, service: Box<dyn IService>) {
+    self.registered_services.push(service);
+  }
+
+  pub async fn start(&mut self, name: &str, cfg: &dyn IConfigReader) -> anyhow::Result<()> {
     if self.services.contains_key(name) {
-      // allready started
-      return;
+      little_boat_abstractions::log_info!("service-manager", "Service {} already started", name);
+      return Ok(());
     }
 
-    let service_tx = self.service_tx.clone();
-    let control_tx = self.control_tx.subscribe();
+    let service_to_start = self.registered_services.iter().find(|s| s.name() == name);
 
-    let handle = if name == "signaling" {
-      start_signaling_service(service_tx, control_tx, cfg)
+    if let Some(service) = service_to_start {
+      let service_tx = self.service_tx.clone();
+      let control_rx = self.control_tx.subscribe();
+
+      let handle = service.start(service_tx, control_rx, cfg).await?;
+      self.services.insert(name.to_string(), ServiceHandle { handle });
+
+      little_boat_abstractions::log_info!("service-manager", "Started service: {}", name);
     } else {
-      return;
-    };
+      little_boat_abstractions::log_error!("service-manager", "Unknown service: {}", name);
+      anyhow::bail!("Unknown service: {}", name);
+    }
 
-    self.services.insert(name.to_string(), ServiceHandle { handle });
+    Ok(())
   }
 
-  pub fn stop(&self, name: &str) {
-    let _ = self.control_tx.send(ControlEvent::Stop(name.to_string()));
+  pub fn stop(&self, name: &str) -> anyhow::Result<()> {
+    self.control_tx.send(ControlEvent::Stop(name.to_string()))?;
+    little_boat_abstractions::log_info!("service-manager", "Sent stop command for service: {}", name);
+    Ok(())
   }
 
-  pub fn shutdown(&self) {
-    let _ = self.control_tx.send(ControlEvent::Shutdown);
+  pub fn shutdown(&self) -> anyhow::Result<()> {
+    self.control_tx.send(ControlEvent::Shutdown)?;
+    little_boat_abstractions::log_info!("service-manager", "Sent shutdown command to all services");
+    Ok(())
   }
 
+  pub fn events(&self) -> broadcast::Receiver<ServiceEvent> {
+    self.service_tx.subscribe()
+  }
+
+  pub async fn wait_services(&mut self) -> anyhow::Result<()> {
+    let names: Vec<String> = self.services.keys().cloned().collect();
+
+    for name in names {
+      if let Some(service) = self.services.remove(&name) {
+        match service.handle.await {
+          Ok(Ok(())) => {
+            little_boat_abstractions::log_info!("service-manager", "Service {} completed successfully", name);
+          }
+          Ok(Err(e)) => {
+            little_boat_abstractions::log_error!("service-manager", "Service {} failed: {}", name, e);
+            return Err(e);
+          }
+          Err(e) => {
+            little_boat_abstractions::log_error!("service-manager", "Service {} panicked: {}", name, e);
+            anyhow::bail!("Service {} panicked: {}", name, e);
+          }
+        }
+      }
+    }
+
+    Ok(())
+  }
 }

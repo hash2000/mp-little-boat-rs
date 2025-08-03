@@ -1,5 +1,5 @@
-use tokio::sync::{broadcast, mpsc};
 use async_trait::async_trait;
+use tokio::sync::broadcast;
 
 use crate::IConfigReader;
 
@@ -10,25 +10,25 @@ pub enum ControlEvent {
   Shutdown,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ServiceEventMessage {
   pub service: String,
   pub message: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ServiceEvent {
   Status(ServiceEventMessage),
   Error(ServiceEventMessage)
 }
 
 #[async_trait]
-pub trait Service: Send + Sync {
+pub trait IService: Send + Sync {
     fn name(&self) -> &'static str;
     async fn start(
         &self,
-        service_tx: mpsc::UnboundedSender<ServiceEvent>,
+        service_tx: broadcast::Sender<ServiceEvent>,
         control_rx: broadcast::Receiver<ControlEvent>,
         config: &dyn IConfigReader,
-    ) -> tokio::task::JoinHandle<()>;
+    ) -> anyhow::Result<tokio::task::JoinHandle<anyhow::Result<()>>>;
 }

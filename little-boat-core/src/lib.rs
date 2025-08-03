@@ -23,6 +23,7 @@ pub async fn run_client_app() -> anyhow::Result<()> {
   init_config(&mut cfg);
 
   let service_manager = ServiceManager::new(&cfg);
+  //service_manage
 
 
   Ok(())
