@@ -65,7 +65,7 @@ impl IService for SignalingService {
 
       // starting event
       let _ = service_tx_clone.send(ServiceEvent::System(
-        little_boat_abstractions::SystemEvent::ServiceStarted { name: service_name_clone.clone() },
+        SystemEvent::ServiceStarted { name: service_name_clone.clone() },
       ));
 
       let peers: Peers = Arc::new(Mutex::new(HashMap::new()));
@@ -145,7 +145,7 @@ async fn handle_client_connection(
   little_boat_abstractions::log_info!(&service_name, "Client connected: {}", client_id);
 
   let _ = service_tx.send(ServiceEvent::Signaling(
-    little_boat_abstractions::SignalingEvent::ClientConnected { client_id: client_id.clone() },
+    SignalingEvent::ClientConnected { client_id: client_id.clone() },
   ));
 
   while let Some(msg) = ws_receiver.next().await {
@@ -211,7 +211,7 @@ async fn handle_client_connection(
 
   // send disconnect event
   let _ = service_tx.send(ServiceEvent::Signaling(
-    little_boat_abstractions::SignalingEvent::ClientDisconnected { client_id: client_id.clone() },
+    SignalingEvent::ClientDisconnected { client_id: client_id.clone() },
   ));
 
   Ok(())
