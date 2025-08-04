@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use bytes::Bytes;
 use futures::{SinkExt, StreamExt};
+use little_boat_abstractions::{SignalingEvent, SystemEvent};
 use little_boat_abstractions::{ControlEvent, IConfigReader, IService, ServiceEvent};
 use std::collections::HashMap;
 use std::sync::Arc;
