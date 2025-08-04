@@ -20,9 +20,7 @@ pub struct ClientApp {
 }
 
 pub async fn run_client_app() -> anyhow::Result<()> {
-  let mut cfg = Box::new(Config::new("common")?);
-  //init_config(&mut cfg);
-
+  let cfg = Box::new(Config::new("common")?);
   let service_manager = ServiceManager::new(cfg);
   //service_manage
 

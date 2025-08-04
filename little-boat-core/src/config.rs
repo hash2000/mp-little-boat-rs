@@ -5,6 +5,8 @@ use little_boat_abstractions::{IConfigReader, IConfigWriter};
 use little_boat_db::database::Database;
 use std::path::PathBuf;
 
+use crate::config::defaults::init_config;
+
 pub struct Config {
   project_dir: ProjectDirs,
   db: Database,
@@ -20,7 +22,10 @@ impl Config {
 
     let db = Database::new(&conf_path, name, None)?;
 
-    Ok(Self { project_dir, db, conf_path })
+    let mut cfg = Self { project_dir, db, conf_path };
+    init_config(&mut cfg);
+
+    Ok(cfg)
   }
   
   pub fn fresh(&mut self, clear_flag: bool) -> bool {

@@ -27,7 +27,7 @@ impl ServiceManager {
       registered_services: Vec::new(),
     };
 
-    //manager.register(Box::new(little_boat_service_signaling::SignalingService));
+    manager.register(Box::new(little_boat_service_signaling::SignalingService));
     manager
   }
 
