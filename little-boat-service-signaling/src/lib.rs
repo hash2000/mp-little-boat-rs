@@ -1,8 +1,7 @@
 use async_trait::async_trait;
 use bytes::Bytes;
 use futures::{SinkExt, StreamExt};
-use little_boat_abstractions::{SignalingEvent, SystemEvent};
-use little_boat_abstractions::{ControlEvent, IConfigReader, IService, ServiceEvent};
+use little_boat_abstractions::{ControlEvent, IConfigReader, IService, ServiceEvent, SignalingMessage};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -23,15 +22,6 @@ type Peers = Arc<
     >,
   >,
 >;
-
-#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub enum SignalingMessage {
-  Offer { sdp: String },
-  Answer { sdp: String },
-  IceCandidate { candidate: String },
-  Ping,
-  Pong,
-}
 
 pub struct SignalingService;
 

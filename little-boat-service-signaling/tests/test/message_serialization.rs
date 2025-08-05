@@ -1,4 +1,4 @@
-use little_boat_service_signaling::SignalingMessage;
+use little_boat_abstractions::SignalingMessage;
 
 #[tokio::test]
 async fn test_signaling_message_serialization() {
