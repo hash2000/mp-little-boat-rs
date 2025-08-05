@@ -1,27 +1,15 @@
 use async_trait::async_trait;
 use bytes::Bytes;
 use futures::{SinkExt, StreamExt};
-use little_boat_abstractions::{ControlEvent, IConfigReader, IService, ServiceEvent, SignalingMessage};
+use little_boat_abstractions::{
+  ControlEvent, IConfigReader, IService, ServiceEvent, SignalingEvent, SignalingMessage,
+  SignalingPeers, SystemEvent,
+};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::sync::broadcast;
-use tokio_tungstenite::{
-  accept_async,
-  tungstenite::protocol::Message,
-};
-
-type Peers = Arc<
-  Mutex<
-    HashMap<
-      String,
-      futures::stream::SplitSink<
-        tokio_tungstenite::WebSocketStream<tokio::net::TcpStream>,
-        Message,
-      >,
-    >,
-  >,
->;
+use tokio_tungstenite::{accept_async, tungstenite::protocol::Message};
 
 pub struct SignalingService;
 
@@ -37,7 +25,6 @@ impl IService for SignalingService {
     mut control_rx: broadcast::Receiver<ControlEvent>,
     config: Box<dyn IConfigReader>,
   ) -> anyhow::Result<tokio::task::JoinHandle<anyhow::Result<()>>> {
-
     let service_name = self.name().to_string();
     let host = config.get_str(b"service.signaling.host", "127.0.0.1");
     let port: u64 = config.get_int(b"service.signaling.port", 8080) as u64;
@@ -45,7 +32,7 @@ impl IService for SignalingService {
     let service_name_clone = service_name.clone();
     let service_tx_clone = service_tx.clone();
 
-    let handle = tokio::spawn(async move {      
+    let handle = tokio::spawn(async move {
       little_boat_abstractions::log_info!(service_name_clone, "Starting signaling service");
 
       let listener = tokio::net::TcpListener::bind(&addr)
@@ -55,11 +42,11 @@ impl IService for SignalingService {
       little_boat_abstractions::log_info!(service_name_clone, "Listening on {}", addr);
 
       // starting event
-      let _ = service_tx_clone.send(ServiceEvent::System(
-        SystemEvent::ServiceStarted { name: service_name_clone.clone() },
-      ));
+      let _ = service_tx_clone.send(ServiceEvent::System(SystemEvent::ServiceStarted {
+        name: service_name_clone.clone(),
+      }));
 
-      let peers: Peers = Arc::new(Mutex::new(HashMap::new()));
+      let peers: SignalingPeers = Arc::new(Mutex::new(HashMap::new()));
 
       loop {
         tokio::select! {
@@ -119,7 +106,7 @@ impl IService for SignalingService {
 
 async fn handle_client_connection(
   stream: tokio::net::TcpStream,
-  peers: Peers,
+  peers: SignalingPeers,
   service_tx: broadcast::Sender<ServiceEvent>,
   service_name: String,
 ) -> anyhow::Result<()> {
@@ -135,9 +122,9 @@ async fn handle_client_connection(
 
   little_boat_abstractions::log_info!(&service_name, "Client connected: {}", client_id);
 
-  let _ = service_tx.send(ServiceEvent::Signaling(
-    SignalingEvent::ClientConnected { client_id: client_id.clone() },
-  ));
+  let _ = service_tx.send(ServiceEvent::Signaling(SignalingEvent::ClientConnected {
+    client_id: client_id.clone(),
+  }));
 
   while let Some(msg) = ws_receiver.next().await {
     match msg {
@@ -201,14 +188,18 @@ async fn handle_client_connection(
   little_boat_abstractions::log_info!(&service_name, "Client disconnected: {}", client_id);
 
   // send disconnect event
-  let _ = service_tx.send(ServiceEvent::Signaling(
-    SignalingEvent::ClientDisconnected { client_id: client_id.clone() },
-  ));
+  let _ = service_tx.send(ServiceEvent::Signaling(SignalingEvent::ClientDisconnected {
+    client_id: client_id.clone(),
+  }));
 
   Ok(())
 }
 
-async fn broadcast_message(peers: &Peers, from_client: &str, message: &str) -> anyhow::Result<()> {
+async fn broadcast_message(
+  peers: &SignalingPeers,
+  from_client: &str,
+  message: &str,
+) -> anyhow::Result<()> {
   let mut p = peers.lock().await;
   let mut to_remove = Vec::new();
 
@@ -230,7 +221,11 @@ async fn broadcast_message(peers: &Peers, from_client: &str, message: &str) -> a
   Ok(())
 }
 
-async fn broadcast_binary(peers: &Peers, from_client: &str, data: Vec<u8>) -> anyhow::Result<()> {
+async fn broadcast_binary(
+  peers: &SignalingPeers,
+  from_client: &str,
+  data: Vec<u8>,
+) -> anyhow::Result<()> {
   let data_bytes: Bytes = data.into(); // cast Vec to Bytes once
   let mut p = peers.lock().await;
   let mut to_remove = Vec::new();
@@ -250,7 +245,11 @@ async fn broadcast_binary(peers: &Peers, from_client: &str, data: Vec<u8>) -> an
   Ok(())
 }
 
-async fn send_to_client(client_id: &str, peers: &Peers, message: &str) -> anyhow::Result<()> {
+async fn send_to_client(
+  client_id: &str,
+  peers: &SignalingPeers,
+  message: &str,
+) -> anyhow::Result<()> {
   let mut p = peers.lock().await;
   if let Some(sender) = p.get_mut(client_id) {
     let _ = sender.send(Message::Text(message.into())).await;
@@ -258,7 +257,11 @@ async fn send_to_client(client_id: &str, peers: &Peers, message: &str) -> anyhow
   Ok(())
 }
 
-async fn send_pong_to_client(client_id: &str, peers: &Peers, data: Vec<u8>) -> anyhow::Result<()> {
+async fn send_pong_to_client(
+  client_id: &str,
+  peers: &SignalingPeers,
+  data: Vec<u8>,
+) -> anyhow::Result<()> {
   let mut p = peers.lock().await;
   if let Some(sender) = p.get_mut(client_id) {
     let _ = sender.send(Message::Pong(data.into())).await;

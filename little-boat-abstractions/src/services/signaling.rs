@@ -1,4 +1,23 @@
+use std::collections::HashMap;
+use std::sync::Arc;
+use tokio::sync::Mutex;
+use tokio_tungstenite::tungstenite::protocol::Message;
+
 use serde::{Deserialize, Serialize};
+
+pub type SignalingPeers = Arc<
+  Mutex<
+    HashMap<
+      // Client ID
+      String,
+      // WebSocket stream sender
+      futures::stream::SplitSink<
+        tokio_tungstenite::WebSocketStream<tokio::net::TcpStream>,
+        Message,
+      >,
+    >,
+  >,
+>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum SignalingEvent {

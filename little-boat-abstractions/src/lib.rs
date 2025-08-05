@@ -2,16 +2,29 @@ mod services;
 mod config;
 
 pub use crate::services::{
+  // types of system events
   SystemEvent,
+
+  // types of controling events
   ControlEvent,
+
+  // types of service events
   ServiceEvent,
+  ServiceEventMessage,
+
+  // types of chat service
   ChatEvent,
+  ChatPeerConnections,
+  ChatSocketSender,
+
+  // types of signaling service
   SignalingEvent,
   SignalingMessage,
-  ServiceEventMessage,
+  SignalingPeers,
+  
+  // service trait
   IService,
 };
-
 
 pub use crate::config::{
   IConfigReader,
