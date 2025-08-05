@@ -11,6 +11,7 @@ use sled::Db;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+#[derive(Clone)]
 pub struct Database {
   handler: Db,
   encryptor: Arc<dyn Encryptor>,

@@ -1,6 +1,6 @@
 use crate::test::test_config::TestConfig;
 
-use std::time::Duration;
+use std::{sync::Arc, time::Duration};
 use little_boat_abstractions::{ControlEvent, IService};
 use little_boat_service_signaling::SignalingService;
 use tokio::sync::broadcast;
@@ -11,7 +11,7 @@ use tokio::sync::broadcast;
     let (service_tx, _service_rx) = broadcast::channel(100);
     let control_tx = broadcast::channel(100).0;
     let control_rx = control_tx.subscribe();
-    let config = Box::new(TestConfig);
+    let config = Arc::new(TestConfig);
 
     // Start service
     let result = service.start(service_tx, control_rx, config).await;

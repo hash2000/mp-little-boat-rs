@@ -29,6 +29,7 @@ pub use crate::services::{
 pub use crate::config::{
   IConfigReader,
   IConfigWriter,
+  IConfig,
 };
 
 

@@ -28,3 +28,5 @@ pub trait IConfigWriter : Send + Sync {
 
   fn set_int(&self, key: &[u8], value: usize) -> anyhow::Result<()>;
 }
+
+pub trait IConfig: IConfigReader + IConfigWriter + Send + Sync {}

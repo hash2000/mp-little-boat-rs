@@ -23,7 +23,7 @@ impl IService for SignalingService {
     &self,
     service_tx: broadcast::Sender<ServiceEvent>,
     mut control_rx: broadcast::Receiver<ControlEvent>,
-    config: Box<dyn IConfigReader>,
+    config: Arc<dyn IConfigReader>,
   ) -> anyhow::Result<tokio::task::JoinHandle<anyhow::Result<()>>> {
     let service_name = self.name().to_string();
     let host = config.get_str(b"service.signaling.host", "127.0.0.1");

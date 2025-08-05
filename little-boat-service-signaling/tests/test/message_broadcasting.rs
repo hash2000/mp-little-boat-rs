@@ -3,7 +3,7 @@ use crate::test::test_config::TestConfig;
 use futures::{SinkExt, StreamExt};
 use little_boat_abstractions::{ControlEvent, IConfigReader, IService};
 use little_boat_service_signaling::SignalingService;
-use std::time::Duration;
+use std::{sync::Arc, time::Duration};
 use tokio::sync::broadcast;
 use tokio_tungstenite::tungstenite::Message;
 
@@ -38,7 +38,7 @@ async fn test_message_broadcasting() {
       }
     }
   }
-  let config_for_broadcast = Box::new(TestConfigForBroadcast(addr.port()));
+  let config_for_broadcast = Arc::new(TestConfigForBroadcast(addr.port()));
 
   let service = SignalingService;
   let (service_tx, _service_rx) = broadcast::channel(100);

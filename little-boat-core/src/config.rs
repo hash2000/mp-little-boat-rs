@@ -1,12 +1,13 @@
 mod defaults;
 
 use directories_next::ProjectDirs;
-use little_boat_abstractions::{IConfigReader, IConfigWriter};
+use little_boat_abstractions::{IConfigReader, IConfigWriter, IConfig};
 use little_boat_db::database::Database;
 use std::path::PathBuf;
 
 use crate::config::defaults::init_config;
 
+#[derive(Clone)]
 pub struct Config {
   project_dir: ProjectDirs,
   db: Database,
@@ -36,6 +37,8 @@ impl Config {
     self.conf_path.clone()
   }
 }
+
+impl IConfig for Config {}
 
 impl IConfigReader for Config {
 

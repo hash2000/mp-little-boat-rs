@@ -3,7 +3,7 @@ use crate::test::test_config::TestConfig;
 use futures::SinkExt;
 use little_boat_abstractions::{ControlEvent, IConfigReader, IService, ServiceEvent, SignalingEvent};
 use little_boat_service_signaling::SignalingService;
-use std::time::Duration;
+use std::{sync::Arc, time::Duration};
 use tokio::sync::broadcast;
 use tokio_tungstenite::tungstenite::Message;
 
@@ -16,7 +16,7 @@ async fn test_client_connect_disconnect() {
   let (service_tx, _) = broadcast::channel(100);
   let control_tx = broadcast::channel(100).0;
   let control_rx = control_tx.subscribe();
-  let config = Box::new(TestConfig);
+  let config = Arc::new(TestConfig);
 
   // start service
   let _ = service.start(service_tx.clone(), control_rx, config).await.unwrap();
@@ -60,7 +60,7 @@ async fn test_client_connect_disconnect() {
       }
     }
   }
-  let config_with_port = Box::new(TestConfigWithPort(addr.port()));
+  let config_with_port = Arc::new(TestConfigWithPort(addr.port()));
 
   // restart service
   let (service_tx, mut service_rx) = broadcast::channel(100);

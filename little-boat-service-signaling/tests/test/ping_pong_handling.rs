@@ -4,7 +4,7 @@ use futures::{SinkExt, StreamExt};
 use little_boat_abstractions::{ControlEvent, IConfigReader, IService};
 use little_boat_service_signaling::SignalingService;
 use tokio_tungstenite::tungstenite::Message;
-use std::time::Duration;
+use std::{sync::Arc, time::Duration};
 use tokio::sync::broadcast;
 
 #[tokio::test]
@@ -39,7 +39,7 @@ async fn test_ping_pong_handling() {
     }
   }
 
-  let config_for_ping_pong = Box::new(TestConfigForPingPong(addr.port()));
+  let config_for_ping_pong = Arc::new(TestConfigForPingPong(addr.port()));
 
   let service = SignalingService;
   let (service_tx, _service_rx) = broadcast::channel(100);

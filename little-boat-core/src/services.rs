@@ -1,5 +1,5 @@
 use little_boat_abstractions::{ControlEvent, IConfigReader, IService, ServiceEvent};
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 use tokio::sync::broadcast;
 
 struct ServiceHandle {
@@ -14,7 +14,7 @@ pub struct ServiceManager {
 }
 
 impl ServiceManager {
-  pub fn new(cfg: Box<dyn IConfigReader>) -> Self {
+  pub fn new(cfg: Arc<dyn IConfigReader>) -> Self {
     let channel_capacity = cfg.get_int(b"service-manager.broadcast.channel.capacity", 100);
 
     let (service_tx, _) = broadcast::channel(channel_capacity);
@@ -35,7 +35,7 @@ impl ServiceManager {
     self.registered_services.push(service);
   }
 
-  pub async fn start(&mut self, name: &str, cfg: Box<dyn IConfigReader>) -> anyhow::Result<()> {
+  pub async fn start(&mut self, name: &str, cfg: Arc<dyn IConfigReader>) -> anyhow::Result<()> {
     if self.services.contains_key(name) {
       little_boat_abstractions::log_info!("service-manager", "Service {} already started", name);
       return Ok(());
@@ -47,7 +47,7 @@ impl ServiceManager {
       let service_tx = self.service_tx.clone();
       let control_rx = self.control_tx.subscribe();
 
-      let handle = service.start(service_tx, control_rx, cfg).await?;
+      let handle = service.start(service_tx, control_rx, cfg.clone()).await?;
       self.services.insert(name.to_string(), ServiceHandle { handle });
 
       little_boat_abstractions::log_info!("service-manager", "Started service: {}", name);

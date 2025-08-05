@@ -3,6 +3,8 @@ mod signaling;
 mod system;
 mod control;
 
+use std::sync::Arc;
+
 use async_trait::async_trait;
 use tokio::sync::broadcast;
 
@@ -36,6 +38,6 @@ pub trait IService: Send + Sync {
     &self,
     service_tx: broadcast::Sender<ServiceEvent>,
     control_rx: broadcast::Receiver<ControlEvent>,
-    config: Box<dyn IConfigReader>,
+    config: Arc<dyn IConfigReader>,
   ) -> anyhow::Result<tokio::task::JoinHandle<anyhow::Result<()>>>;
 }

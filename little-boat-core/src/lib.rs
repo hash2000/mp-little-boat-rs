@@ -1,29 +1,29 @@
 mod config;
 mod services;
 
-use tokio::sync::mpsc::Receiver;
+use std::sync::Arc;
+use little_boat_abstractions::IConfig;
 
-use little_boat_abstractions::ControlEvent;
-
-use crate::{
-  config::Config,
-  services::ServiceManager,
-};
-
+use crate::{config::Config, services::ServiceManager};
 
 pub struct ClientApp {
-  // local database with all configurations 
-  cfg: Config,
+  // local database with all configurations
+  cfg: Arc<dyn IConfig>,
 
-  // 
-  control_rx: Receiver<ControlEvent>,
+  //
+  service_manager: ServiceManager,
 }
 
-pub async fn run_client_app() -> anyhow::Result<()> {
-  let cfg = Box::new(Config::new("common")?);
-  let service_manager = ServiceManager::new(cfg);
-  //service_manage
+impl ClientApp {
+  pub fn new() -> anyhow::Result<Self> {
+    let cfg: Arc<dyn IConfig> = Arc::new(Config::new("common")?);
+    let service_manager = ServiceManager::new(cfg.clone());
 
+    let app = Self { 
+      cfg, 
+      service_manager
+    };
 
-  Ok(())
+    Ok(app)
+  }
 }
