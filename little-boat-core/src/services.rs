@@ -28,6 +28,7 @@ impl ServiceManager {
     };
 
     manager.register(Box::new(little_boat_service_signaling::SignalingService));
+    manager.register(Box::new(little_boat_service_chat::ChatService::new()));
     manager
   }
 

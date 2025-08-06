@@ -11,8 +11,22 @@ repository.workspace = true
 [lib]
 path = "src/lib.rs"
 
+[dev-dependencies]
+tokio-test.workspace = true
+
 [dependencies]
 little-boat-abstractions = { path = "../little-boat-abstractions"}
 little-boat-db = { path = "../little-boat-db" }
 tokio.workspace = true
 webrtc.workspace = true
+async-trait.workspace = true
+anyhow.workspace = true
+bytes.workspace = true
+env_logger.workspace = true
+futures.workspace = true
+log.workspace = true
+rand.workspace = true
+simd-json.workspace = true
+serde.workspace = true
+tokio-tungstenite.workspace = true
+uuid.workspace = true
