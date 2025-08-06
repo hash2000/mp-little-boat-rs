@@ -62,13 +62,15 @@ impl ServiceManager {
 
   pub fn stop(&self, name: &str) -> anyhow::Result<()> {
     self.control_tx.send(ControlEvent::Stop(name.to_string()))?;
-    little_boat_abstractions::log_info!("service-manager", "Sent stop command for service: {}", name);
+    little_boat_abstractions::log_info!("service-manager",
+      "Sent stop command for service: {}", name);
     Ok(())
   }
 
   pub fn shutdown(&self) -> anyhow::Result<()> {
     self.control_tx.send(ControlEvent::Shutdown)?;
-    little_boat_abstractions::log_info!("service-manager", "Sent shutdown command to all services");
+    little_boat_abstractions::log_info!("service-manager", 
+      "Sent shutdown command to all services");
     Ok(())
   }
 
@@ -83,14 +85,17 @@ impl ServiceManager {
       if let Some(service) = self.services.remove(&name) {
         match service.handle.await {
           Ok(Ok(())) => {
-            little_boat_abstractions::log_info!("service-manager", "Service {} completed successfully", name);
+            little_boat_abstractions::log_info!("service-manager", 
+              "Service {} completed successfully", name);
           }
           Ok(Err(e)) => {
-            little_boat_abstractions::log_error!("service-manager", "Service {} failed: {}", name, e);
+            little_boat_abstractions::log_error!("service-manager", 
+              "Service {} failed: {}", name, e);
             return Err(e);
           }
           Err(e) => {
-            little_boat_abstractions::log_error!("service-manager", "Service {} panicked: {}", name, e);
+            little_boat_abstractions::log_error!("service-manager", 
+              "Service {} panicked: {}", name, e);
             anyhow::bail!("Service {} panicked: {}", name, e);
           }
         }

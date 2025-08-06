@@ -1,7 +1,7 @@
 mod config;
 mod services;
 
-use std::sync::Arc;
+use std::{any, sync::Arc};
 use little_boat_abstractions::IConfig;
 
 use crate::{config::Config, services::ServiceManager};
@@ -25,5 +25,19 @@ impl ClientApp {
     };
 
     Ok(app)
+  }
+
+  pub async fn serve(&mut self, name: &str) -> anyhow::Result<()> {
+    self.service_manager.start(name, self.cfg.clone()).await
+  }
+
+  pub fn stop(&self, name: &str) -> anyhow::Result<()> {
+    self.service_manager.stop(name)
+  }
+
+  pub async fn shutdown(&mut self) -> anyhow::Result<()> {
+    self.service_manager.shutdown()?;
+    self.service_manager.wait_services().await?;
+    Ok(())
   }
 }

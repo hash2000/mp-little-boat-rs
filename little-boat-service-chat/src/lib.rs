@@ -53,7 +53,8 @@ impl IService for ChatService {
     let peer_connections = self.peer_connections.clone();
 
     let handle = tokio::spawn(async move {
-      little_boat_abstractions::log_info!(service_name, "Starting chat service for user: {}", user_id);
+      little_boat_abstractions::log_info!(service_name, 
+        "Starting chat service for user: {}", user_id);
       
 
       Ok(())

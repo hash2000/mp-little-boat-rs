@@ -1,5 +1,4 @@
 mod application;
-mod services;
 mod views;
 
 use anyhow::Result;
@@ -13,7 +12,7 @@ use ratatui::{Terminal, backend::CrosstermBackend};
 use std::{io, time::Duration};
 use tokio::sync::mpsc;
 
-use crate::{application::Application, services::run_services};
+use crate::application::Application;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -23,10 +22,9 @@ async fn main() -> Result<()> {
   let backend = CrosstermBackend::new(stdout);
   let mut terminal = Terminal::new(backend)?;
 
-  let (tx, mut rx) = mpsc::unbounded_channel::<ServiceEvent>();
-  run_services(tx);
 
-  let mut app = Application::new();
+  let mut app = Application::new()?;
+  app.init().await?;
 
   loop {
     if app.exit() {
@@ -35,9 +33,9 @@ async fn main() -> Result<()> {
 
     app.begin_frame();
 
-    while let Ok(event) = rx.try_recv() {
-      app.handle_service_event(&event);
-    }
+    // while let Ok(event) = rx.try_recv() {
+    //   app.handle_service_event(&event);
+    // }
 
     terminal.draw(|f| app.draw(f))?;
 
@@ -45,6 +43,8 @@ async fn main() -> Result<()> {
       app.append_event(&event::read()?);
     }
   }
+
+  app.shutdown().await?;
 
   disable_raw_mode()?;
   execute!(terminal.backend_mut(), LeaveAlternateScreen)?;

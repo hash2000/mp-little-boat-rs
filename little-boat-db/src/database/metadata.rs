@@ -14,9 +14,9 @@ pub fn initialize(db: &mut Database, name: &str) -> anyhow::Result<()> {
     append(db, name)?;
     // a new database has been initialized
     db.fresh = true;
+  } else {
+    db.fresh = false;
   }
-
-  db.fresh = false;
 
   Ok(())
 }
@@ -73,7 +73,7 @@ fn read(db: &Database, name: &str) -> anyhow::Result<()> {
   Ok(())
 }
 
-fn append(db: &Database, name: &str) -> anyhow::Result<()> {
+fn append(db: &Database, name: &str) -> anyhow::Result<(bool)> {
   let metadata = json!({
     "database": {
       "name": name,
@@ -82,9 +82,11 @@ fn append(db: &Database, name: &str) -> anyhow::Result<()> {
   });
 
   let metadata = to_vec(&metadata)?;
-  db.handler
-    .insert(b"metadata", metadata)?
-    .ok_or(anyhow::anyhow!("Can't create metadata for database [{:?}]", name))?;
+  let insert_result = db.handler
+    .insert(b"metadata", metadata)?;
 
-  Ok(())
+  match insert_result {
+    Some(v) => Ok(false),
+    None => Ok(true)
+  };
 }
