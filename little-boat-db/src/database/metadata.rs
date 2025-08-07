@@ -7,25 +7,31 @@ pub const METADATA_VERSION: &'static str = "0.0.1";
 
 // if a new database has been created, then return the true result
 pub fn initialize(db: &mut Database, name: &str) -> anyhow::Result<()> {
-  let read_result = read(db, name);
+  let read_result = read(db, name)?;
 
   // metadata isn't read. i'm trying to write new once
-  if read_result.is_err() {
+  if read_result {
+    
+    db.fresh = false;
+  } else {
     append(db, name)?;
+
     // a new database has been initialized
     db.fresh = true;
-  } else {
-    db.fresh = false;
   }
 
   Ok(())
 }
 
-fn read(db: &Database, name: &str) -> anyhow::Result<()> {
-  let mut metadata = db
+fn read(db: &Database, name: &str) -> anyhow::Result<bool> {
+  let metadata = db
     .handler
-    .get(b"metadata")?
-    .ok_or(anyhow::anyhow!("Can't read metadata from database '{:?}'", name))?;
+    .get(b"metadata")?;
+
+  let mut metadata = match metadata {
+    Some(value) => value,
+    None => return Ok(false)
+  };
 
   let metadata = simd_json::to_owned_value(&mut metadata)?;
   let Some(database_f) = metadata.get("database") else {
@@ -70,10 +76,10 @@ fn read(db: &Database, name: &str) -> anyhow::Result<()> {
     ));
   }
 
-  Ok(())
+  Ok(true)
 }
 
-fn append(db: &Database, name: &str) -> anyhow::Result<(bool)> {
+fn append(db: &Database, name: &str) -> anyhow::Result<bool> {
   let metadata = json!({
     "database": {
       "name": name,
@@ -86,7 +92,7 @@ fn append(db: &Database, name: &str) -> anyhow::Result<(bool)> {
     .insert(b"metadata", metadata)?;
 
   match insert_result {
-    Some(v) => Ok(false),
+    Some(_) => Ok(false),
     None => Ok(true)
-  };
+  }
 }
