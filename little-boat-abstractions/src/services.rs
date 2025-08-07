@@ -10,7 +10,7 @@ use tokio::sync::broadcast;
 
 use crate::IConfigReader;
 
-pub use crate::services::chat::{ ChatEvent, ChatPeerConnections, ChatSocketSender};
+pub use crate::services::chat::{ ChatEvent, ChatMessage, ChatPeerConnections, ChatSender, ChatReceiver };
 pub use crate::services::signaling::{ SignalingEvent, SignalingMessage, SignalingPeers };
 pub use crate::services::system::SystemEvent;
 pub use crate::services::control::ControlEvent;

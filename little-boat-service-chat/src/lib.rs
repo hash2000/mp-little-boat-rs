@@ -1,30 +1,15 @@
+mod chat;
+mod chat_messages;
+
 use async_trait::async_trait;
-use bytes::Bytes;
-use futures::{SinkExt, StreamExt};
-use little_boat_abstractions::ChatPeerConnections;
 use little_boat_abstractions::{
-  ControlEvent, IConfigReader, IService, ServiceEvent, SignalingEvent, SignalingMessage,
-  SignalingPeers, SystemEvent,
+  ControlEvent, IConfigReader, IService, ServiceEvent,
 };
 use uuid::Uuid;
-use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::Mutex;
 use tokio::sync::broadcast;
-use tokio_tungstenite::{accept_async, tungstenite::protocol::Message};
 
-
-pub struct ChatService {
-    peer_connections: ChatPeerConnections,
-}
-
-impl ChatService {
-    pub fn new() -> Self {
-        Self {
-            peer_connections: Arc::new(Mutex::new(HashMap::new())),
-        }
-    }
-}
+pub use crate::chat::ChatService;
 
 #[async_trait]
 impl IService for ChatService {
@@ -35,7 +20,7 @@ impl IService for ChatService {
   async fn start(
     &self,
     service_tx: broadcast::Sender<ServiceEvent>,
-    mut control_rx: broadcast::Receiver<ControlEvent>,
+    control_rx: broadcast::Receiver<ControlEvent>,
     config: Arc<dyn IConfigReader>,
   ) -> anyhow::Result<tokio::task::JoinHandle<anyhow::Result<()>>> {
     let service_name = self.name().to_string();
@@ -50,14 +35,18 @@ impl IService for ChatService {
     // clone shared valuses
     let service_name = service_name.clone();
     let service_tx = service_tx.clone();
-    let peer_connections = self.peer_connections.clone();
+
+    let self_arc = Arc::new(self.clone_inner());
 
     let handle = tokio::spawn(async move {
-      little_boat_abstractions::log_info!(service_name, 
-        "Starting chat service for user: {}", user_id);
-      
-
-      Ok(())
+        self_arc.run_chat_service(
+          service_tx,
+          control_rx,
+          signaling_url,
+          stun_server,
+          user_id,
+          service_name,
+      ).await
     });
 
     Ok(handle)
