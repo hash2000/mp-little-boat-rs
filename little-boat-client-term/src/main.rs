@@ -1,52 +1,46 @@
 mod application;
-mod views;
+mod ui;
 
 use anyhow::Result;
+use application::poll_event;
 use crossterm::{
-  event::{self},
   execute,
-  terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode, enable_raw_mode},
+  terminal::{EnterAlternateScreen, LeaveAlternateScreen, disable_raw_mode},
 };
-use little_boat_abstractions::ServiceEvent;
 use ratatui::{Terminal, backend::CrosstermBackend};
-use std::{io, time::Duration};
+use std::io::{self};
 use tokio::sync::mpsc;
 
 use crate::application::Application;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-  enable_raw_mode()?;
+  // initialize terminal
   let mut stdout = io::stdout();
   execute!(stdout, EnterAlternateScreen)?;
+
   let backend = CrosstermBackend::new(stdout);
   let mut terminal = Terminal::new(backend)?;
 
+  // create Application
+  let mut app = Application::new();
 
-  let mut app = Application::new()?;
-  app.init().await?;
-
-  loop {
-    if app.exit() {
-      break;
+  // create application event tssk
+  let (event_tx, mut event_rx) = mpsc::unbounded_channel();
+  tokio::spawn(async move {
+    loop {
+      if poll_event(event_tx.clone()).await.is_err() {
+        break;
+      }
     }
+  });
 
-    app.begin_frame();
+  // run main loop
+  app.run(&mut terminal, &mut event_rx).await?;
 
-    // while let Ok(event) = rx.try_recv() {
-    //   app.handle_service_event(&event);
-    // }
-
-    terminal.draw(|f| app.draw(f))?;
-
-    if crossterm::event::poll(Duration::from_millis(50))? {
-      app.append_event(&event::read()?);
-    }
-  }
-
-  app.shutdown().await?;
-
+  // end TUI
   disable_raw_mode()?;
   execute!(terminal.backend_mut(), LeaveAlternateScreen)?;
+
   Ok(())
 }

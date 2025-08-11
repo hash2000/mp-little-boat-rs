@@ -74,7 +74,7 @@ impl ServiceManager {
     Ok(())
   }
 
-  pub fn events(&self) -> broadcast::Receiver<ServiceEvent> {
+  pub fn service_events(&self) -> broadcast::Receiver<ServiceEvent> {
     self.service_tx.subscribe()
   }
 
