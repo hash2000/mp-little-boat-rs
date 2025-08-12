@@ -66,24 +66,24 @@ impl Application {
 
     self.client.run().await?;
 
-    tokio::spawn(async move {
-      if let Err(e) = run_client_app().await {
-        eprintln!("Client app error: {}", e);
-      }
-    });
+    // tokio::spawn(async move {
+    //   if let Err(e) = run_client_app().await {
+    //     eprintln!("Client app error: {}", e);
+    //   }
+    // });
 
     loop {
       if !self.begin_frame(terminal)? {
         break;
       }
 
-      match tokio::time::timeout(Duration::from_millis(100), event_rx.recv()).await {
-        Ok(Some(event)) => {
+      let result_event = event_rx.try_recv();
+      match result_event {
+        Ok(event) => {
           if self.handle_event(event, &service_tx).await? {
             break;
           }
         }
-        Ok(None) => break,
         Err(_) => {
           if self.last_tick.elapsed() >= Duration::from_secs(1) {
             self.last_tick = Instant::now();

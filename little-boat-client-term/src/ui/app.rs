@@ -33,6 +33,8 @@ impl TuiApp {
 
     app.add_widget(Box::new(chat::ChatDashboardWidget::new()));
     app.add_widget(Box::new(chat::InputWidget::new()));
+    app.add_widget(Box::new(chat::StatusBarWidget::new()));
+    app.add_widget(Box::new(chat::UserListWidget::new()));
 
     Ok(app)
   }
