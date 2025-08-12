@@ -47,9 +47,6 @@ impl ClientApp {
     self.serve("signaling").await?;
     self.serve("chat").await?;
 
-    // process services events
-    self.process_service_events().await?;
-
     Ok(())
   }
 

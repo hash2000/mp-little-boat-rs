@@ -91,6 +91,8 @@ impl Application {
           }
         }
       }
+
+      self.client.process_service_events().await?;
     }
 
 
