@@ -1,8 +1,10 @@
-use little_boat_abstractions::{ChatEvent, IConfig, ServiceEvent, SignalingEvent, SystemEvent};
-use tokio::sync::broadcast;
 use std::sync::Arc;
 
-use crate::{config::Config, services::ServiceManager};
+use little_boat_abstractions::{ChatEvent, IConfig, ServiceEvent, SignalingEvent, SystemEvent};
+use tokio::sync::broadcast;
+
+use crate::config::Config;
+use crate::services::ServiceManager;
 
 pub struct ClientApp {
   // local database with all configurations
@@ -19,7 +21,7 @@ impl ClientApp {
     let cfg: Arc<dyn IConfig> = Arc::new(Config::new("common")?);
     let service_manager = ServiceManager::new(cfg.clone());
     let event_rx = service_manager.service_events();
-    
+
     let app = Self { cfg, service_manager, event_rx };
 
     Ok(app)
@@ -39,8 +41,6 @@ impl ClientApp {
   }
 
   pub async fn run(&mut self) -> anyhow::Result<()> {
-    self.init_logging();
-
     little_boat_abstractions::log_info!("client-app", "Starting client application");
 
     // Start serveices
@@ -50,42 +50,41 @@ impl ClientApp {
     // process services events
     self.process_service_events().await?;
 
-    // wait when all services ended
-    self.service_manager.wait_services().await?;
-
-    little_boat_abstractions::log_info!("client-app", "Client application stopped");
     Ok(())
   }
 
-  async fn process_service_events(&mut self) -> anyhow::Result<()> {
-    loop {
-      tokio::select! {
-          // services events
-          event_result = self.event_rx.recv() => {
-              match event_result {
-                  Ok(event) => {
-                      self.handle_service_event(event).await?;
-                  }
-                  Err(broadcast::error::RecvError::Closed) => {
-                      little_boat_abstractions::log_info!("client-app", "Service event channel closed");
-                      break;
-                  }
-                  Err(broadcast::error::RecvError::Lagged(_)) => {
-                      little_boat_abstractions::log_warn!("client-app", "Service event channel lagged");
-                  }
-              }
-          }
+  pub async fn process_service_events(&mut self) -> anyhow::Result<bool> {
+    tokio::select! {
+        // services events
+        event_result = self.event_rx.recv() => {
+            match event_result {
+                Ok(event) => {
+                    self.handle_service_event(event).await?;
+                }
+                Err(broadcast::error::RecvError::Closed) => {
+                    little_boat_abstractions::log_info!("client-app", "Service event channel closed");
+                    return Ok(false);
+                }
+                Err(broadcast::error::RecvError::Lagged(_)) => {
+                    little_boat_abstractions::log_warn!("client-app", "Service event channel lagged");
+                }
+            }
+        }
 
-          // application exit (Ctrl+C)
-          _ = tokio::signal::ctrl_c() => {
-              little_boat_abstractions::log_info!("client-app", "Received Ctrl+C, shutting down");
-              self.shutdown().await?;
-              break;
-          }
-      }
+        // application exit (Ctrl+C)
+        _ = tokio::signal::ctrl_c() => {
+            little_boat_abstractions::log_info!("client-app", "Received Ctrl+C, shutting down");
+            self.shutdown().await?;
+            return Ok(false);
+        }
     }
 
-    Ok(())
+    Ok(true)
+  }
+
+  pub async fn wait_services(&mut self) -> anyhow::Result<()> {
+    little_boat_abstractions::log_info!("client-app", "Client application stopped");
+    self.service_manager.wait_services().await
   }
 
   async fn handle_service_event(&self, event: ServiceEvent) -> anyhow::Result<()> {
@@ -154,16 +153,5 @@ impl ClientApp {
       }
     }
     Ok(())
-  }
-
-  fn init_logging(&self) {
-    use env_logger::Builder;
-    use log::LevelFilter;
-
-    let log_level =
-      if self.cfg.get_bool(b"app.debug", false) { LevelFilter::Debug } else { LevelFilter::Info };
-
-    // Ignore error
-    Builder::new().filter(None, log_level).try_init().ok();
   }
 }

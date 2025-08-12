@@ -1,5 +1,6 @@
 mod application;
 mod ui;
+mod notifications;
 
 use anyhow::Result;
 use application::poll_event;
@@ -23,7 +24,7 @@ async fn main() -> Result<()> {
   let mut terminal = Terminal::new(backend)?;
 
   // create Application
-  let mut app = Application::new();
+  let mut app = Application::new()?;
 
   // create application event tssk
   let (event_tx, mut event_rx) = mpsc::unbounded_channel();

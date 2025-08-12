@@ -4,21 +4,25 @@ mod state;
 
 use std::time::{Duration, Instant};
 
-use crossterm::event::KeyCode;
+use crossterm::event::{Event, KeyCode, KeyModifiers, 
+  poll as crosstermpool,
+  read as crosstermread
+};
 use little_boat_abstractions::{
   ChatEvent, ServiceEvent, ServiceEventMessage, SignalingEvent, SystemEvent,
 };
-use little_boat_core::run_client_app;
+use little_boat_core::{run_client_app, ClientApp};
 use tokio::sync::mpsc;
 
-pub use crate::application::event::AppEvent;
-pub use crate::application::event::poll_event;
+pub use crate::application::event::{AppEvent, poll_event};
 pub use crate::application::service_status::ServiceStatus;
 pub use crate::application::state::AppState;
-use crate::ui;
+use crate::ui::TuiApp;
 
 pub struct Application {
   pub state: AppState,
+  pub tui: TuiApp,
+  pub client: ClientApp,
   pub services: Vec<ServiceStatus>,
   pub chat_messages: Vec<String>,
   pub connected_users: Vec<String>,
@@ -27,9 +31,11 @@ pub struct Application {
 }
 
 impl Application {
-  pub fn new() -> Self {
-    Self {
+  pub fn new() -> anyhow::Result<Self> {
+    let app = Self {
       state: AppState::Initializing,
+      tui: TuiApp::new()?,
+      client: ClientApp::new()?,
       services: vec![
         ServiceStatus {
           name: "signaling".to_string(),
@@ -46,7 +52,9 @@ impl Application {
       connected_users: Vec::new(),
       status_message: "Welcome to Little Boat Chat!".to_string(),
       last_tick: Instant::now(),
-    }
+    };
+
+    Ok(app)
   }
 
   pub async fn run(
@@ -54,8 +62,9 @@ impl Application {
     terminal: &mut ratatui::Terminal<impl ratatui::backend::Backend>,
     event_rx: &mut mpsc::UnboundedReceiver<AppEvent>,
   ) -> anyhow::Result<()> {
-    // Запускаем клиентское приложение в отдельной задаче
-    let (service_tx, mut service_rx) = mpsc::unbounded_channel();
+    let (service_tx, mut service_rx) = mpsc::unbounded_channel::<ServiceEvent>();
+
+    self.client.run().await?;
 
     tokio::spawn(async move {
       if let Err(e) = run_client_app().await {
@@ -63,12 +72,11 @@ impl Application {
       }
     });
 
-    // Основной цикл TUI
     loop {
-      // Рендерим UI
-      terminal.draw(|frame| ui::draw(frame, self))?;
+      if !self.begin_frame(terminal)? {
+        break;
+      }
 
-      // Обрабатываем события
       match tokio::time::timeout(Duration::from_millis(100), event_rx.recv()).await {
         Ok(Some(event)) => {
           if self.handle_event(event, &service_tx).await? {
@@ -77,7 +85,6 @@ impl Application {
         }
         Ok(None) => break,
         Err(_) => {
-          // Timeout - отправляем Tick событие
           if self.last_tick.elapsed() >= Duration::from_secs(1) {
             self.last_tick = Instant::now();
             self.handle_event(AppEvent::Tick, &service_tx).await?;
@@ -86,7 +93,27 @@ impl Application {
       }
     }
 
+
+    self.client.wait_services().await?;
+
     Ok(())
+  }
+
+  fn begin_frame(
+    &mut self,
+    terminal: &mut ratatui::Terminal<impl ratatui::backend::Backend>,
+  ) -> anyhow::Result<(bool)> {
+    if self.tui.should_quit() {
+      return Ok(false);
+    }
+
+    self.tui.cleanup_notifications();
+
+    terminal.draw(|frame| {
+      self.tui.render(frame);
+    })?;
+
+    Ok(true)
   }
 
   async fn handle_event(
@@ -96,7 +123,10 @@ impl Application {
   ) -> anyhow::Result<bool> {
     match event {
       AppEvent::Key(key) => {
-        if key.kind == crossterm::event::KeyEventKind::Press {
+
+        if key.kind == crossterm::event::KeyEventKind::Press
+          && key.modifiers.contains(KeyModifiers::CONTROL)
+        {
           match key.code {
             KeyCode::Char('q') | KeyCode::Esc => {
               self.state = AppState::Shutdown;
@@ -105,7 +135,7 @@ impl Application {
             KeyCode::Char('s') => {
               self.start_service("signaling", service_tx).await?;
             }
-            KeyCode::Char('c') => {
+            KeyCode::Char('a') => {
               self.start_service("chat", service_tx).await?;
             }
             KeyCode::Char('x') => {
@@ -116,6 +146,8 @@ impl Application {
             }
             _ => {}
           }
+        } else {
+          self.tui.handle_key_event(key)?;
         }
       }
 
