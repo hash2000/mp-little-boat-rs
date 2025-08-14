@@ -41,16 +41,25 @@ impl ClientApp {
   }
 
   pub async fn run(&mut self) -> anyhow::Result<()> {
+    
     little_boat_abstractions::log_info!("client-app", "Starting client application");
 
     // Start serveices
     self.serve("signaling").await?;
     self.serve("chat").await?;
 
+        // process services events
+    self.process_service_events().await?;
+
+    // wait when all services ended
+    self.service_manager.wait_services().await?;
+
+    little_boat_abstractions::log_info!("client-app", "Client application stopped");
+
     Ok(())
   }
 
-  pub async fn process_service_events(&mut self) -> anyhow::Result<bool> {
+  async fn process_service_events(&mut self) -> anyhow::Result<bool> {
     tokio::select! {
         // services events
         event_result = self.event_rx.recv() => {
@@ -79,8 +88,7 @@ impl ClientApp {
     Ok(true)
   }
 
-  pub async fn wait_services(&mut self) -> anyhow::Result<()> {
-    little_boat_abstractions::log_info!("client-app", "Client application stopped");
+  async fn wait_services(&mut self) -> anyhow::Result<()> {    
     self.service_manager.wait_services().await
   }
 
