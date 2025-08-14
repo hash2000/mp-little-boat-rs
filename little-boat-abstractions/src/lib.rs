@@ -14,8 +14,10 @@ pub use crate::services::{
 
   // types of chat service
   ChatEvent,
+  ChatMessage,
   ChatPeerConnections,
-  ChatSocketSender,
+  ChatSender,
+  ChatReceiver,
 
   // types of signaling service
   SignalingEvent,

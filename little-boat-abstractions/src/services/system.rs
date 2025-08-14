@@ -6,3 +6,4 @@ pub enum SystemEvent {
   ServiceStopped { name: String },
   Error { service: String, message: String },
 }
+

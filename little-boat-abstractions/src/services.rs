@@ -1,7 +1,7 @@
 mod chat;
+mod control;
 mod signaling;
 mod system;
-mod control;
 
 use std::sync::Arc;
 
@@ -10,11 +10,12 @@ use tokio::sync::broadcast;
 
 use crate::IConfigReader;
 
-pub use crate::services::chat::{ ChatEvent, ChatPeerConnections, ChatSocketSender};
-pub use crate::services::signaling::{ SignalingEvent, SignalingMessage, SignalingPeers };
-pub use crate::services::system::SystemEvent;
+pub use crate::services::chat::{
+  ChatEvent, ChatMessage, ChatPeerConnections, ChatReceiver, ChatSender,
+};
 pub use crate::services::control::ControlEvent;
-
+pub use crate::services::signaling::{SignalingEvent, SignalingMessage, SignalingPeers};
+pub use crate::services::system::SystemEvent;
 
 #[derive(Debug, Clone)]
 pub struct ServiceEventMessage {
