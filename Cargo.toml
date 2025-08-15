@@ -79,4 +79,5 @@ categories = [
 	"chat"
 ]
 repository = "https://github.com/hash2000/mp-little-boat-rs"
-license = "SSPL"
+license = "AGPL-3.0"
+
