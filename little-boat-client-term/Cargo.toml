@@ -20,4 +20,5 @@ ratatui.workspace = true
 crossterm.workspace = true
 anyhow.workspace = true
 tokio.workspace = true
+futures-core.workspace = true
 

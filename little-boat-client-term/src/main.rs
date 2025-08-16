@@ -1,5 +1,9 @@
-use little_boat_core::run_client_app;
+mod application;
 
+use std::io::stdout;
+
+use little_boat_core::run_client_app;
+use crate::application::TuiApplication;
 
 
 #[tokio::main]
@@ -9,6 +13,9 @@ async fn main() -> anyhow::Result<()> {
       eprintln!("Client app error: {}", e);
     }
   });
+
+
+  let app = TuiApplication::new(stdout())?;
 
   Ok(())
 }
