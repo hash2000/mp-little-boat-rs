@@ -25,11 +25,16 @@ where
   where
     S: Stream<Item = crossterm::event::Event>,
   {
+    self.init()?;
+    self.prepare_frame().await?;
+
+    Ok(())
+  }
+
+  fn init(&mut self) -> anyhow::Result<()> {
     crossterm::style::force_color_output(true);
     enable_raw_mode()?;
     execute!(self.buffer, EnterAlternateScreen, EnableFocusChange)?;
-
-    self.prepare_frame().await?;
 
     Ok(())
   }
