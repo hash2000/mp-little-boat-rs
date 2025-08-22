@@ -1,8 +1,8 @@
 use std::io::Write;
 
-use crossterm::event::EnableFocusChange;
-use crossterm::execute;
+use crossterm::event::{DisableFocusChange, EnableFocusChange};
 use crossterm::terminal::{EnterAlternateScreen, enable_raw_mode};
+use crossterm::{execute, terminal};
 use futures_core::Stream;
 
 pub struct TuiApplication<W>
@@ -23,11 +23,11 @@ where
 
   pub async fn run<S>(&mut self, input: &mut S) -> anyhow::Result<()>
   where
-    S: Stream<Item = crossterm::event::Event>,
+    S: Stream<Item = std::io::Result<crossterm::event::Event>>,
   {
     self.init()?;
-    self.prepare_frame().await?;
-
+    self.event_loop(input).await?;
+    self.restore()?;
     Ok(())
   }
 
@@ -35,11 +35,20 @@ where
     crossterm::style::force_color_output(true);
     enable_raw_mode()?;
     execute!(self.buffer, EnterAlternateScreen, EnableFocusChange)?;
-
+    execute!(self.buffer, terminal::Clear(terminal::ClearType::All))?;
     Ok(())
   }
 
-  async fn prepare_frame(&mut self) -> anyhow::Result<()> {
+  fn restore(&mut self) -> anyhow::Result<()> {
+    execute!(self.buffer, DisableFocusChange, terminal::LeaveAlternateScreen)?;
+    terminal::disable_raw_mode()?;
+    Ok(())
+  }
+
+  async fn event_loop<S>(&mut self, input: &mut S) -> anyhow::Result<()>
+  where
+    S: Stream<Item = std::io::Result<crossterm::event::Event>>,
+  {
     Ok(())
   }
 }

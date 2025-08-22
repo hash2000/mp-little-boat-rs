@@ -1,6 +1,7 @@
 mod application;
 
 use std::io::stdout;
+use crossterm::event::EventStream;
 
 use little_boat_core::run_client_app;
 use crate::application::TuiApplication;
@@ -15,7 +16,8 @@ async fn main() -> anyhow::Result<()> {
   });
 
 
-  let app = TuiApplication::new(stdout())?;
+  let mut app = TuiApplication::new(stdout())?;
+  app.run(&mut EventStream::new()).await?;
 
   Ok(())
 }
