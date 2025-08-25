@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug client slint (LLDB)",
+            "name": "Debug client iced (LLDB)",
             "preLaunchTask": "rust: cargo build",
             "type": "lldb",
             "request": "launch",

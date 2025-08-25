@@ -1,7 +1,6 @@
 [package]
 name = "little-boat-client"
 default-run = "little-boat-client"
-build = "src/build.rs"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
