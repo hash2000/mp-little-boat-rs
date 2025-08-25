@@ -18,9 +18,7 @@ path = "src/main.rs"
 little-boat-db = { path = "../little-boat-db" }
 little-boat-core = { path = "../little-boat-core" }
 tokio.workspace = true
-slint.workspace = true
+iced.workspace = true
 anyhow.workspace = true
 simd-json.workspace = true
 
-[build-dependencies]
-slint-build.workspace = true

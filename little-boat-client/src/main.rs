@@ -1,9 +1,14 @@
-slint::include_modules!();
+use simd_json::derived;
 
-#[tokio::main]
-async fn main() -> anyhow::Result<()> {
-  let ui = ApplicationWindow::new()?;
-
-  ui.run()?;
+fn main() -> iced::Result<()> {
   Ok(())
+}
+
+struct Program {
+
+}
+
+#[derive(Debug, Clone)]
+enum Message {
+  
 }
