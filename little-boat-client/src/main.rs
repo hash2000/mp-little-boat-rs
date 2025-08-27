@@ -1,44 +1,74 @@
+mod chat;
+
 use iced::border;
 use iced::keyboard;
 use iced::mouse;
+use iced::overlay::menu::Catalog;
 use iced::overlay::menu::Menu;
+use iced::widget;
+use iced::widget::text_input;
 use iced::widget::{
-  button, center, checkbox, column, container, horizontal_rule, horizontal_space,
-  pick_list, row, scrollable, stack, text, vertical_rule,
+  button, center, checkbox, column, container, horizontal_rule, horizontal_space, pick_list, row,
+  scrollable, stack, text, vertical_rule,
 };
+use iced::Task;
 use iced::{
   Center, Element, Fill, Font, Length, Point, Rectangle, Renderer, Shrink, Subscription, Theme,
   color,
 };
+use once_cell::sync::Lazy;
 use simd_json::derived;
 
+static MESSAGE_LOG: Lazy<scrollable::Id> = Lazy::new(scrollable::Id::unique);
+
+#[derive(Debug)]
+enum State {
+  Disconnected,
+  Connected(chat::Connection),
+}
+
 fn main() -> iced::Result {
-  iced::application(Program::title, Program::update, Program::view)
+  iced::application("Little Boat (Hash2000)", Program::update, Program::view)
     .subscription(Program::subscription)
     .theme(Program::theme)
-    .run()
+    .run_with(Program::new)
 }
 
 #[derive(Debug)]
 struct Program {
-  title: &'static str,
   theme: Theme,
-}
-
-impl Default for Program {
-    fn default() -> Self {
-        Self { title: "Little Boat (Hash2000)", theme: Theme::default() }
-    }
+  messages: Vec<chat::Message>,
+  new_message: String,
+  state: State,
 }
 
 #[derive(Debug, Clone)]
 enum Message {
-  Initialized,
+    NewMessageChanged(String),
+    Send(chat::Message),
+    Server,
 }
 
 impl Program {
-  pub fn title(&self) -> String {
-    self.title.to_string()
+
+  pub  fn new() -> (Self, Task<Message>) {
+    (
+      Self {
+        theme: Theme::Light,
+        messages: vec![
+          chat::Message::connected(),
+          chat::Message::new("Привет мужик, как делища?").unwrap(),
+          chat::Message::new("А сейчас?").unwrap(),
+          chat::Message::new("а ещё сейчас вот точно как?").unwrap(),
+        ],
+        new_message: String::new(),
+        state: State::Disconnected,
+      },
+      Task::batch([
+          Task::perform(chat::run_echo(), |_| Message::Server),
+          widget::focus_next(),
+      ]),
+    )
   }
 
   pub fn theme(&self) -> Theme {
@@ -59,37 +89,42 @@ impl Program {
   pub fn update(&mut self, message: Message) {}
 
   pub fn view(&self) -> Element<'_, Message> {
-    let header = row![
-      text(self.title).size(20).font(Font::MONOSPACE),
-      horizontal_space(),
-    ]
-    .spacing(20)
-    .align_y(Center);
+    let message_log: Element<_> = if self.messages.is_empty() {
+      center(text("Your messages will appear here...").color(color!(0x888888))).into()
+    } else {
+      scrollable(column(self.messages.iter().map(text).map(Element::from)).spacing(10))
+        .id(MESSAGE_LOG.clone())
+        .height(Fill)
+        .into()
+    };
 
-    // let example = center(if self.explain {
-    //   self.example.view().explain(color!(0x0000ff))
-    // } else {
-    //   self.example.view()
-    // })
-    // .style(|theme| {
-    //   let palette = theme.extended_palette();
+    let new_message_input = {
+      let mut input = text_input("Type a message...", &self.new_message)
+        .on_input(Message::NewMessageChanged)
+        .padding(10);
 
-    //   container::Style::default().border(border::color(palette.background.strong.color).width(4))
-    // })
-    // .padding(4);
+      let mut button = button(text("Send")
+          .height(40)
+          .align_y(Center))
+        .padding([0, 20]);
 
-    // let controls = row(
-    //   [
-    //     (!self.example.is_first())
-    //       .then_some(button("← Previous").padding([5, 10]).on_press(Message::Previous).into()),
-    //     Some(horizontal_space().into()),
-    //     (!self.example.is_last())
-    //       .then_some(button("Next →").padding([5, 10]).on_press(Message::Next).into()),
-    //   ]
-    //   .into_iter()
-    //   .flatten(),
-    // );
+      if matches!(self.state, State::Connected(_)) {
+        if let Some(message) = chat::Message::new(&self.new_message) {
+          input = input.on_submit(Message::Send(message.clone()));
+          button = button.on_press(Message::Send(message));
+        }
+      }
 
-    column![header].spacing(10).padding(20).into()
+      row![input, button]
+        .spacing(10)
+        .align_y(Center)
+    };
+
+    column![message_log, new_message_input]
+      .height(Fill)
+      .padding(20)
+      .spacing(10)
+      .into()
+
   }
 }
