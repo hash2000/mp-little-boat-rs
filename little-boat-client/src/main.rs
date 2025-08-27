@@ -1,130 +1,142 @@
-mod chat;
+mod server;
+mod echo;
 
-use iced::border;
-use iced::keyboard;
-use iced::mouse;
-use iced::overlay::menu::Catalog;
-use iced::overlay::menu::Menu;
-use iced::widget;
-use iced::widget::text_input;
 use iced::widget::{
-  button, center, checkbox, column, container, horizontal_rule, horizontal_space, pick_list, row,
-  scrollable, stack, text, vertical_rule,
+    self, button, center, column, row, scrollable, text, text_input,
 };
-use iced::Task;
-use iced::{
-  Center, Element, Fill, Font, Length, Point, Rectangle, Renderer, Shrink, Subscription, Theme,
-  color,
-};
+use iced::{color, Center, Element, Fill, Subscription, Task};
 use once_cell::sync::Lazy;
-use simd_json::derived;
 
-static MESSAGE_LOG: Lazy<scrollable::Id> = Lazy::new(scrollable::Id::unique);
-
-#[derive(Debug)]
-enum State {
-  Disconnected,
-  Connected(chat::Connection),
+pub fn main() -> iced::Result {
+    iced::application("WebSocket - Iced", WebSocket::update, WebSocket::view)
+        .subscription(WebSocket::subscription)
+        .run_with(WebSocket::new)
 }
 
-fn main() -> iced::Result {
-  iced::application("Little Boat (Hash2000)", Program::update, Program::view)
-    .subscription(Program::subscription)
-    .theme(Program::theme)
-    .run_with(Program::new)
-}
-
-#[derive(Debug)]
-struct Program {
-  theme: Theme,
-  messages: Vec<chat::Message>,
-  new_message: String,
-  state: State,
+struct WebSocket {
+    messages: Vec<echo::Message>,
+    new_message: String,
+    state: State,
 }
 
 #[derive(Debug, Clone)]
 enum Message {
     NewMessageChanged(String),
-    Send(chat::Message),
+    Send(echo::Message),
+    Echo(echo::Event),
     Server,
 }
 
-impl Program {
+impl WebSocket {
+    fn new() -> (Self, Task<Message>) {
+        (
+            Self {
+                messages: Vec::new(),
+                new_message: String::new(),
+                state: State::Disconnected,
+            },
+            Task::batch([
+                Task::perform(server::run_echo(), |_| Message::Server),
+                widget::focus_next(),
+            ]),
+        )
+    }
 
-  pub  fn new() -> (Self, Task<Message>) {
-    (
-      Self {
-        theme: Theme::Light,
-        messages: vec![
-          chat::Message::connected(),
-          chat::Message::new("Привет мужик, как делища?").unwrap(),
-          chat::Message::new("А сейчас?").unwrap(),
-          chat::Message::new("а ещё сейчас вот точно как?").unwrap(),
-        ],
-        new_message: String::new(),
-        state: State::Disconnected,
-      },
-      Task::batch([
-          Task::perform(chat::run_echo(), |_| Message::Server),
-          widget::focus_next(),
-      ]),
-    )
-  }
+    fn update(&mut self, message: Message) -> Task<Message> {
+        match message {
+            Message::NewMessageChanged(new_message) => {
+                self.new_message = new_message;
 
-  pub fn theme(&self) -> Theme {
-    self.theme.clone()
-  }
+                Task::none()
+            }
+            Message::Send(message) => match &mut self.state {
+                State::Connected(connection) => {
+                    self.new_message.clear();
 
-  pub fn subscription(&self) -> Subscription<Message> {
-    use keyboard::key;
-    keyboard::on_key_release(|key, modifiers| match key {
-      // keyboard::Key::Named(key::Named::ArrowLeft) => {
-      //     Some(Message::Previous)
-      // }
-      // keyboard::Key::Named(key::Named::ArrowRight) => Some(Message::Next),
-      _ => None,
-    })
-  }
+                    connection.send(message);
 
-  pub fn update(&mut self, message: Message) {}
+                    Task::none()
+                }
+                State::Disconnected => Task::none(),
+            },
+            Message::Echo(event) => match event {
+                echo::Event::Connected(connection) => {
+                    self.state = State::Connected(connection);
 
-  pub fn view(&self) -> Element<'_, Message> {
-    let message_log: Element<_> = if self.messages.is_empty() {
-      center(text("Your messages will appear here...").color(color!(0x888888))).into()
-    } else {
-      scrollable(column(self.messages.iter().map(text).map(Element::from)).spacing(10))
-        .id(MESSAGE_LOG.clone())
-        .height(Fill)
-        .into()
-    };
+                    self.messages.push(echo::Message::connected());
 
-    let new_message_input = {
-      let mut input = text_input("Type a message...", &self.new_message)
-        .on_input(Message::NewMessageChanged)
-        .padding(10);
+                    Task::none()
+                }
+                echo::Event::Disconnected => {
+                    self.state = State::Disconnected;
 
-      let mut button = button(text("Send")
-          .height(40)
-          .align_y(Center))
-        .padding([0, 20]);
+                    self.messages.push(echo::Message::disconnected());
 
-      if matches!(self.state, State::Connected(_)) {
-        if let Some(message) = chat::Message::new(&self.new_message) {
-          input = input.on_submit(Message::Send(message.clone()));
-          button = button.on_press(Message::Send(message));
+                    Task::none()
+                }
+                echo::Event::MessageReceived(message) => {
+                    self.messages.push(message);
+
+                    scrollable::snap_to(
+                        MESSAGE_LOG.clone(),
+                        scrollable::RelativeOffset::END,
+                    )
+                }
+            },
+            Message::Server => Task::none(),
         }
-      }
+    }
 
-      row![input, button]
-        .spacing(10)
-        .align_y(Center)
-    };
+    fn subscription(&self) -> Subscription<Message> {
+        Subscription::run(echo::connect).map(Message::Echo)
+    }
 
-    column![message_log, new_message_input]
-      .height(Fill)
-      .padding(20)
-      .spacing(10)
-      .into()
+    fn view(&self) -> Element<Message> {
+        let message_log: Element<_> = if self.messages.is_empty() {
+            center(
+                text("Your messages will appear here...")
+                    .color(color!(0x888888)),
+            )
+            .into()
+        } else {
+            scrollable(
+                column(self.messages.iter().map(text).map(Element::from))
+                    .spacing(10),
+            )
+            .id(MESSAGE_LOG.clone())
+            .height(Fill)
+            .into()
+        };
 
-  }
+        let new_message_input = {
+            let mut input = text_input("Type a message...", &self.new_message)
+                .on_input(Message::NewMessageChanged)
+                .padding(10);
+
+            let mut button = button(text("Send").height(40).align_y(Center))
+                .padding([0, 20]);
+
+            if matches!(self.state, State::Connected(_)) {
+                if let Some(message) = echo::Message::new(&self.new_message) {
+                    input = input.on_submit(Message::Send(message.clone()));
+                    button = button.on_press(Message::Send(message));
+                }
+            }
+
+            row![input, button].spacing(10).align_y(Center)
+        };
+
+        column![message_log, new_message_input]
+            .height(Fill)
+            .padding(20)
+            .spacing(10)
+            .into()
+    }
 }
+
+enum State {
+    Disconnected,
+    Connected(echo::Connection),
+}
+
+static MESSAGE_LOG: Lazy<scrollable::Id> = Lazy::new(scrollable::Id::unique);
