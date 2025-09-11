@@ -1,27 +1,69 @@
-import { TabWidget, HorizontalBox, StyleMetrics, Palette, Button } from "std-widgets.slint";
+import { TabWidget, HorizontalBox, StyleMetrics, Palette, Button, TextEdit } from "std-widgets.slint";
 import { ChatGroupSideBar } from "ChatGroupSideBar.slint";
+import { FontSettings } from "../../Styles.slint";
+
+export enum ChatMessageFormat {
+    Markdown
+}
+
+export struct ChatMessage {
+    id: string,
+    sender: string,
+    content: string,
+    format: ChatMessageFormat,
+}
+
+export component ChatMessageListView {    
+    in-out property <[ChatMessage]> messages;
+
+    pure callback on_message(msg: string);
+
+    for item[index] in self.messages : VerticalLayout {
+        TextInput {
+            font-size: FontSettings.body.font-size;
+            font-weight: FontSettings.body.font-weight;
+            text: item.content;
+        }
+    }
+
+}
+
+export component ChatMessageInputView {
+    pure callback send-message(msg: string);
+
+    HorizontalLayout {
+        input-text := TextEdit {
+            font-size: FontSettings.body.font-size;
+            //  Valid units are: %, phx, px, cm, mm, in, pt, rem, s, ms, deg, grad, turn, rad
+            preferred-height: 3 * self.font-size * 2 + 0.0769rem;
+            wrap: word-wrap;            
+        }
+
+        Button {
+            text: "Send";
+            clicked => {
+                root.send-message(self.text); 
+            }
+        }
+    }
+}
 
 export component ChatView {
     preferred-height: 100%;
     preferred-width: 100%;
-
     forward-focus: focus-scope;
     focus-scope := FocusScope { }
 
     Rectangle {
         background: Palette.background;
+        VerticalLayout {
+            message-list := ChatMessageListView {
 
-        HorizontalLayout {
-            chat-side-bar := ChatGroupSideBar {
-                selected(item, index) => {
-                    
-                }
             }
-            
-            Button {
-                text: "Add group";
-                clicked => {
-                    
+
+            ChatMessageInputView {
+                send-message(msg) => {                    
+                    message-list.on_message(msg);
                 }
             }
         }
