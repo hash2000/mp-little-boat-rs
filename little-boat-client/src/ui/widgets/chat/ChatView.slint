@@ -1,4 +1,4 @@
-import { TabWidget, HorizontalBox, StyleMetrics, Palette, Button, TextEdit } from "std-widgets.slint";
+import { TabWidget, HorizontalBox, StyleMetrics, Palette, Button, TextEdit, ScrollView, VerticalBox, ListView } from "std-widgets.slint";
 import { ChatGroupSideBar } from "ChatGroupSideBar.slint";
 import { FontSettings } from "../../Styles.slint";
 
@@ -13,36 +13,37 @@ export struct ChatMessage {
     format: ChatMessageFormat,
 }
 
-export component ChatMessageListView {    
+export global ChatViewAdapter {
     in-out property <[ChatMessage]> messages;
+    pure callback message(msg: string);
+}
 
-    pure callback on_message(msg: string);
-
-    for item[index] in self.messages : VerticalLayout {
-        TextInput {
-            font-size: FontSettings.body.font-size;
-            font-weight: FontSettings.body.font-weight;
-            text: item.content;
+export component ChatMessageListView {
+    VerticalBox {
+        ListView {
+            for item[index] in ChatViewAdapter.messages: TextInput {
+                font-size: FontSettings.body.font-size;
+                font-weight: FontSettings.body.font-weight;
+                text: item.content;
+            }
         }
     }
-
 }
 
 export component ChatMessageInputView {
     pure callback send-message(msg: string);
-
     HorizontalLayout {
         input-text := TextEdit {
             font-size: FontSettings.body.font-size;
             //  Valid units are: %, phx, px, cm, mm, in, pt, rem, s, ms, deg, grad, turn, rad
             preferred-height: 3 * self.font-size * 2 + 0.0769rem;
-            wrap: word-wrap;            
+            wrap: word-wrap;
         }
 
         Button {
             text: "Send";
             clicked => {
-                root.send-message(self.text); 
+                root.send-message(input-text.text);
             }
         }
     }
@@ -57,13 +58,11 @@ export component ChatView {
     Rectangle {
         background: Palette.background;
         VerticalLayout {
-            message-list := ChatMessageListView {
-
-            }
+            ChatMessageListView { }
 
             ChatMessageInputView {
-                send-message(msg) => {                    
-                    message-list.on_message(msg);
+                send-message(msg) => {
+                    ChatViewAdapter.message(msg);
                 }
             }
         }
