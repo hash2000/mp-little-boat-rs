@@ -1,7 +1,6 @@
 [package]
 name = "little-boat-client"
 default-run = "little-boat-client"
-build = "src/build.rs"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -18,10 +17,8 @@ path = "src/main.rs"
 little-boat-db = { path = "../little-boat-db" }
 little-boat-core = { path = "../little-boat-core" }
 tokio.workspace = true
-slint.workspace = true
+qmetaobject.workspace = true
+cstr.workspace = true
 anyhow.workspace = true
 simd-json.workspace = true
 pulldown-cmark.workspace = true
-
-[build-dependencies]
-slint-build.workspace = true
