@@ -6,10 +6,24 @@ export enum ChatMessageFormat {
     Markdown
 }
 
+export enum ChatMessageContentType {
+    Text,
+    Citation,
+    Image,
+    Heading,
+}
+
+export struct ChatMessageContentItem {
+    data: string,
+    content-type: ChatMessageContentType,
+    font-size-mul: length,
+}
+
 export struct ChatMessage {
     id: string,
     sender: string,
-    content: string,
+    content-raw: string,
+    content: [ChatMessageContentItem],
     format: ChatMessageFormat,
 }
 
@@ -19,12 +33,25 @@ export global ChatViewAdapter {
 }
 
 export component ChatMessageListView {
-    VerticalBox {
+    VerticalLayout {
         ListView {
-            for item[index] in ChatViewAdapter.messages: TextInput {
-                font-size: FontSettings.body.font-size;
-                font-weight: FontSettings.body.font-weight;
-                text: item.content;
+            for message[message_index] in ChatViewAdapter.messages: Rectangle {
+                clip: true;
+                max-width: 100px;
+                min-height: FontSettings.body.font-size;
+                background: #227bc0;
+                border-radius: 5px;
+                padding: 5px;
+
+                VerticalLayout {
+                    padding: 5px;
+
+                    for item[index] in message.content: TextInput {
+                        font-size: FontSettings.body.font-size + item.font-size-mul;
+                        font-weight: FontSettings.body.font-weight;
+                        text: item.data;
+                    }
+                }
             }
         }
     }
@@ -44,6 +71,7 @@ export component ChatMessageInputView {
             text: "Send";
             clicked => {
                 root.send-message(input-text.text);
+                input-text.text = "";
             }
         }
     }

@@ -1,0 +1,55 @@
+import { TabWidget, HorizontalBox, StyleMetrics, Palette, Button, TextEdit, ScrollView, VerticalBox, ListView } from "std-widgets.slint";
+import { FontSettings } from "../Styles.slint";
+
+export enum TestFormattedTextType {
+    Text,
+    Image,
+    Heading,
+    CodeStart,
+    CodeEnd,
+    Bold,
+    Italic,
+}
+
+export struct TestFormattedText {
+    data: string,
+    content-type: TestFormattedTextType,
+}
+
+export global TestFormattedTextViewAdapter {
+    in property <[TestFormattedText]> items: [
+        {
+            data: "Дополнительный пример: Кастомный обработчик",
+            content-type: TestFormattedTextType.Heading,
+        },
+        {
+            data: "Дополнительный пример: Кастомный обработчик",
+            content-type: TestFormattedTextType.Bold,
+        },
+        {
+            data: "Дополнительный пример: Кастомный обработчик",
+            content-type: TestFormattedTextType.Italic,
+        },
+        {
+            data: "rust",
+            content-type: TestFormattedTextType.CodeStart,
+        }
+    ];
+}
+
+export component TestFormattedTextView {
+    width: 400px;
+    height: 400px;
+    VerticalBox {
+        alignment: LayoutAlignment.start;
+        
+        for item[index] in TestFormattedTextViewAdapter.items: TextInput {
+            read-only: true;            
+            wrap: word-wrap;
+            text: item.data;
+            font-weight: item.content-type == TestFormattedTextType.Bold ? 
+                FontSettings.semibold-font-weight : FontSettings.regular-font-weight;
+            font-italic: item.content-type == TestFormattedTextType.Italic;
+        }
+    }
+}
