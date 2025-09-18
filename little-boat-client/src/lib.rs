@@ -6,31 +6,29 @@
 
 // use std::sync::Arc;
 
-// pub mod controllers {
-//   pub mod chat_view_controller;
-// }
+pub mod controllers {
+  pub mod chat_controller;
+}
 
-// use controllers::*;
-
-
-use cstr::cstr;
-
+use controllers::*;
 use qmetaobject::prelude::*;
 
-mod implementations;
 
-qrc!(my_resource,
-    "todos/qml" {
-        "ui/main.qml",
-    },
+qrc!(ui_resources,
+  "qml" {
+    "ui/chat/main.qml",
+  },
 );
 
 pub async fn run_app() -> anyhow::Result<()> {
-    my_resource();
-    qml_register_type::<implementations::Todos>(cstr!("RustCode"), 1, 0, cstr!("Todos"));
-    let mut engine = QmlEngine::new();
-    engine.load_file("qrc:/todos/qml/ui/main.qml".into());
-    engine.exec();
+
+  chat_controller::init();
+
+  ui_resources();
+
+  let mut engine = QmlEngine::new();
+  engine.load_file("qrc:/qml/ui/chat/main.qml".into());
+    
 
   
   // tokio::spawn(async move {
@@ -39,10 +37,6 @@ pub async fn run_app() -> anyhow::Result<()> {
   //   }
   // });
 
-  // let app = ui::ApplicationWindow::new()?;
-  // let chat_view = Arc::new(chat_view_controller::Controller::new());
-  // chat_view_controller::init(&app, chat_view.clone());
-
-  // app.run()?;
+  engine.exec();
   Ok(())
 }
