@@ -11,6 +11,10 @@
             "args": [
                 "${workspaceFolder}little-boat-client/src/main.rs"
             ],
+            "env": {
+                "QML_IMPORT_TRACE": "1",
+                "QT_QML_DEBUG": "1"
+            }
         },
         {
             "name": "Debug client term (LLDB)",

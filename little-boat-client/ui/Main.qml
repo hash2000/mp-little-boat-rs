@@ -1,8 +1,8 @@
-import QtQuick 2.15
-import QtQuick.Window 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
-import Chat 1.0
+import QtQuick
+import QtQuick.Window
+import QtQuick.Controls
+import QtQuick.Layouts
+import Chat
 
 ApplicationWindow {
     id: root
@@ -10,9 +10,36 @@ ApplicationWindow {
     height: 500
     visible: true
     title: "Markdown Chat"
+    color: Style.backgroundColor
 
-    // Модель чата
-    property var chatModel: ChatModel {}
+    ChatMessagesListModel {
+        id: messagesListModel
+    }
+
+    // Панель переключения темы
+    Rectangle {
+        id: themeSwitcher
+        width: 40
+        height: 40
+        radius: 20
+        color: Style.darkTheme ? Style.darkMessageEven : Style.lightMessageEven
+        anchors {
+            top: parent.top
+            right: parent.right
+            margins: 10
+        }
+
+        Text {
+            text: Style.darkTheme ? "☀️" : "🌙"
+            font.pointSize: 16
+            anchors.centerIn: parent
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: Style.darkTheme = !Style.darkTheme
+        }
+    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -25,16 +52,21 @@ ApplicationWindow {
             Layout.fillHeight: true
             clip: true
 
+            ScrollBar.vertical: ScrollBar {
+                background: Rectangle { color: Style.scrollbarBackgroundColor }
+                contentItem: Rectangle { color: Style.scrollbarHandleColor; radius: 3 }
+            }
+
             ListView {
                 id: messageList
-                model: chatModel.messages
+                model: messagesListModel.messages
                 spacing: 10
                 verticalLayoutDirection: ListView.BottomToTop
 
                 delegate: Rectangle {
                     width: ListView.view.width - 20
                     height: messageColumn.height + 20
-                    color: index % 2 === 0 ? "#e3f2fd" : "#f3e5f5"
+                    color: index % 2 === 0 ? Style.messageEvenColor : Style.messageOddColor
                     radius: 10
                     anchors.horizontalCenter: parent.horizontalCenter
 
@@ -45,14 +77,15 @@ ApplicationWindow {
                         spacing: 5
 
                         Repeater {
-                            model: items
+                            model: itemType && content ? itemType.length : 0
 
                             delegate: Text {
                                 width: parent.width
                                 wrapMode: Text.Wrap
-                                text: content
+                                text: content[index] || ""
+                                color: Style.textColor
                                 font: {
-                                    switch(type) {
+                                    switch(itemType[index]) {
                                     case 1: return Qt.font({family: "Arial", bold: true, pointSize: 16})
                                     case 2: return Qt.font({family: "Arial", bold: true, pointSize: 14})
                                     case 3: return Qt.font({family: "Arial", bold: true, pointSize: 12})
@@ -72,17 +105,12 @@ ApplicationWindow {
         Rectangle {
             Layout.fillWidth: true
             Layout.preferredHeight: Math.min(messageEdit.implicitHeight + 20, 150)
-            color: "#f5f5f5"
-            border.color: "#cccccc"
+            color: "transparent"
 
             RowLayout {
                 anchors.fill: parent
-                anchors.margins: 10                
-
-                Button {
-                    text: "Edit"
-                    onClicked: editDialog.open()
-                }
+                anchors.margins: 10
+                spacing: 10
 
                 ScrollView {
                     Layout.fillWidth: true
@@ -90,17 +118,35 @@ ApplicationWindow {
 
                     TextArea {
                         id: messageEdit
-                        placeholderText: "Type your message (Markdown supported)..."
+                        placeholderText: "Type your message ..."
                         wrapMode: TextArea.Wrap
                         selectByMouse: true
+                        color: Style.textColor
+                        placeholderTextColor: Style.placeholderColor
+
+                        background: Rectangle {
+                            color: Style.inputBackgroundColor
+                            radius: 8
+                            border.width: 0
+                        }
                     }
                 }
 
                 Button {
                     text: "Send"
+                    background: Rectangle {
+                        color: Style.buttonBackgroundColor
+                        radius: 8
+                    }
+                    contentItem: Text {
+                        text: parent.text
+                        color: Style.buttonTextColor
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
                     onClicked: {
                         if (messageEdit.text.trim() !== "") {
-                            chatModel.send_message(messageEdit.text)
+                            messagesListModel.send_message(messageEdit.text)
                             messageEdit.clear()
                         }
                     }
@@ -109,35 +155,11 @@ ApplicationWindow {
         }
     }
 
-    // Диалог редактирования
-    Dialog {
-        id: editDialog
-        modal: true
-        title: "Edit Message"
-        standardButtons: Dialog.Ok | Dialog.Cancel
-
-        width: root.width * 0.8
-        height: root.height * 0.6
-
-        ScrollView {
-            anchors.fill: parent
-            TextArea {
-                id: largeEdit
-                text: messageEdit.text
-                wrapMode: TextArea.Wrap
-                selectByMouse: true
-            }
-        }
-
-        onAccepted: messageEdit.text = largeEdit.text
-    }
-
     // Обработка сигналов
     Connections {
-        target: chatModel
-        onSend_message: {
-            var parsed = chatModel.parse_markdown(message)
-            chatModel.add_message(parsed)
+        target: messagesListModel
+        function onSend_message(message) {
+            console.log("Message sent to backend:", message)
         }
     }
 }

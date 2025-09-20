@@ -62,6 +62,9 @@ serde_json = "1.0.145"
 # connectivity
 webrtc = "0.13.0"
 
+# file watcher
+notify = "8.2.0"
+
 rand = "0.9.2"
 tempfile = "3.22.0"
 directories-next = "2.0.0"
