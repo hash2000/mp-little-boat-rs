@@ -2,18 +2,19 @@ mod frontend;
 
 pub mod controllers {
   pub mod chat_controller;
+  pub mod host_controller;
 }
 
 use controllers::*;
 use qmetaobject::prelude::*;
 
-use crate::frontend::hot_reload_watch;
-
 pub fn run_app() -> anyhow::Result<()> {
+  env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
   qmetaobject::log::init_qt_to_rust();
-  frontend::resources_init();  
 
+  frontend::resouces::init();  
   chat_controller::init();
+  host_controller::init();
 
   let mut engine = QmlEngine::new();
   //engine.load_file("qrc:LittleBoat/ui/Styles.qml".into());
@@ -31,7 +32,9 @@ pub fn run_app() -> anyhow::Result<()> {
 
   let arc_engine = std::sync::Arc::new(engine);
 
-  hot_reload_watch(std::path::PathBuf::from("little-boat-client/ui/"), arc_engine.clone());
+  frontend::hot_reload::watch(
+    std::path::PathBuf::from("little-boat-client/ui/"),
+    arc_engine.clone());
 
   arc_engine.exec();
 

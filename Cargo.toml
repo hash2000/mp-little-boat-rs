@@ -23,7 +23,7 @@ env_logger = "0.11.8"
 
 # errors 
 thiserror = "2"
-anyhow = "1.0.98"
+anyhow = "1.0.100"
 
 # key-value embedded database
 sled = "0.34.7"
@@ -56,11 +56,11 @@ pulldown-cmark = "0.13.0"
 # json
 simd-json = "0.16.0"
 jsonwebtoken = "9.3.1"
-serde = { version = "1.0.225", features = ["derive"] }
+serde = { version = "1.0.226", features = ["derive"] }
 serde_json = "1.0.145"
 
 # connectivity
-webrtc = "0.13.0"
+webrtc = "0.14.0"
 
 # file watcher
 notify = "8.2.0"

@@ -1,6 +1,6 @@
 use qmetaobject::prelude::*;
 
-pub fn resources_init() {
+pub fn init() {
   // qrc!(ui_resources,
   //   "LittleBoat" {
   //     "ui/chat/main.qml",

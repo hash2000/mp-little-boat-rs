@@ -1,8 +1,3 @@
-/*
- * SPDX-FileCopyrightText: Copyright (C) 2025 kalaksi@users.noreply.github.com
- * SPDX-License-Identifier: GPL-3.0-or-later
- */
-
 use std::{
     path::PathBuf,
     thread,
@@ -12,7 +7,7 @@ use qmetaobject;
 use std::sync::Arc;
 
 #[cfg(debug_assertions)]
-pub fn hot_reload_watch(path: PathBuf, engine: Arc<qmetaobject::QmlEngine>) {
+pub fn watch(path: PathBuf, engine: Arc<qmetaobject::QmlEngine>) {
 
     use notify::{self, Watcher};
 

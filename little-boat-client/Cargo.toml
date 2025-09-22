@@ -22,5 +22,8 @@ cstr.workspace = true
 anyhow.workspace = true
 simd-json.workspace = true
 pulldown-cmark.workspace = true
-log.workspace = true
+
 notify.workspace = true
+
+log.workspace = true
+env_logger.workspace = true

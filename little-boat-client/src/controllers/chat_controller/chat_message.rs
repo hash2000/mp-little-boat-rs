@@ -1,6 +1,7 @@
 use pulldown_cmark::{Event, HeadingLevel, Parser, Tag};
 use qmetaobject::*;
 use std::collections::HashMap;
+use std::vec::Vec;
 
 // chat message types
 #[derive(Debug, Clone)]
@@ -19,12 +20,21 @@ const MESSAGE_ITEM_CONTENT: i32 = USER_ROLE + 1;
 #[derive(Debug, Clone)]
 pub struct MessageItem {
   pub content_type: MessageItemType,
-  pub content: String,
+  pub content: QString,
 }
 
 impl From<MessageItemType> for QVariant {
   fn from(item_type: MessageItemType) -> Self {
     (item_type as i32).into()
+  }
+}
+
+impl From<MessageItem> for QVariant {
+  fn from(value: MessageItem) -> Self {
+    let mut map = QVariantMap::default();
+    map.insert("contentType".into(), value.content_type.into());
+    map.insert("content".into(), value.content.clone().into());
+    map.into()
   }
 }
 
@@ -37,7 +47,6 @@ pub struct ChatMessage {
   list: Vec<MessageItem>,
 }
 
-
 impl ChatMessage {
   pub fn push(&mut self, item: MessageItem) {
     let end = self.list.len();
@@ -46,17 +55,32 @@ impl ChatMessage {
     (self as &mut dyn QAbstractListModel).end_insert_rows();
     self.count_changed();
   }
-} 
+}
 
-// impl From<ChatMessage> for QVariant {
-//   fn from(value: ChatMessage) -> Self {
-    
-//   }
-// }
+impl Clone for ChatMessage {
+  fn clone(&self) -> Self {
+    Self {
+      count: self.count.clone(),
+      list: self.list.clone(),
+      ..Default::default()
+    }
+  }
+}
+
+impl From<ChatMessage> for QVariant {
+  fn from(value: ChatMessage) -> Self {
+    let mut result = QVariantList::default();
+    for item in value.list.iter() {
+      result.push(item.into());
+    }
+
+    result.into()
+  }
+}
 
 impl From<String> for ChatMessage {
-  fn from(msg: String) -> Self { 
-    let mut message = ChatMessage::default();     
+  fn from(msg: String) -> Self {
+    let mut message = ChatMessage::default();
     let items = parse_markdown_impl(msg);
     for item in items {
       message.push(item);
@@ -69,7 +93,7 @@ impl QAbstractListModel for ChatMessage {
   fn row_count(&self) -> i32 {
     self.list.len() as i32
   }
-  
+
   fn data(&self, index: QModelIndex, role: i32) -> QVariant {
     let idx = index.row() as usize;
     if idx >= self.list.len() {
@@ -78,11 +102,11 @@ impl QAbstractListModel for ChatMessage {
       match role {
         MESSAGE_ITEM_CONTENT_TYPE => QVariant::from(self.list[idx].content_type.clone()),
         MESSAGE_ITEM_CONTENT => QString::from(self.list[idx].content.clone()).into(),
-        _ => QVariant::default()
+        _ => QVariant::default(),
       }
     }
   }
-  
+
   fn role_names(&self) -> HashMap<i32, QByteArray> {
     let mut map = HashMap::new();
     map.insert(MESSAGE_ITEM_CONTENT_TYPE, "itemType".into());
@@ -90,7 +114,6 @@ impl QAbstractListModel for ChatMessage {
     map
   }
 }
-
 
 fn parse_markdown_impl(msg: String) -> Vec<MessageItem> {
   let parser = Parser::new(&msg);
@@ -103,7 +126,7 @@ fn parse_markdown_impl(msg: String) -> Vec<MessageItem> {
     match event {
       Event::Start(tag) => {
         current_type = match tag {
-          Tag::Heading{ level, id, classes, attrs } => match level {
+          Tag::Heading { level, id, classes, attrs } => match level {
             HeadingLevel::H1 => MessageItemType::Header1,
             HeadingLevel::H2 => MessageItemType::Header2,
             _ => MessageItemType::Header3,
