@@ -1,5 +1,5 @@
 pragma Singleton
-import QtQuick
+import QtQuick 
 
 QtObject {
     // Текущая тема

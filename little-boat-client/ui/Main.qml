@@ -3,13 +3,14 @@ import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Layouts
 import Chat
+import "./Themes"
 
 ApplicationWindow {
     id: root
     width: 600
     height: 500
     visible: true
-    title: "Markdown Chat"
+    title: "Chat"
     color: Style.backgroundColor
 
     ChatMessagesListModel {
