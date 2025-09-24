@@ -7,12 +7,38 @@ pub mod controllers {
 
 use controllers::*;
 use qmetaobject::prelude::*;
+use qmetaobject::log as qt_log;
+
+extern "C" fn qml_message_handler(
+    msg_type: qt_log::QtMsgType, 
+    context: &qt_log::QMessageLogContext, 
+    message: &qmetaobject::QString
+) {
+    let rust_level = match msg_type {
+        qt_log::QtMsgType::QtDebugMsg => {
+          let category = context.category();
+          if category.is_empty() || category == "qml" || category == "js" {
+            ::log::Level::Info
+          }
+          else {
+            ::log::Level::Debug
+          }
+        },
+        qt_log::QtMsgType::QtInfoMsg => ::log::Level::Info,
+        qt_log::QtMsgType::QtWarningMsg => ::log::Level::Warn,
+        qt_log::QtMsgType::QtCriticalMsg => ::log::Level::Error,
+        qt_log::QtMsgType::QtFatalMsg => ::log::Level::Error,
+    };
+    
+    ::log::log!(rust_level, "QML: {}", message);
+}
 
 pub fn run_app() -> anyhow::Result<()> {
   env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
   qmetaobject::log::init_qt_to_rust();
+  qmetaobject::log::install_message_handler(Some(qml_message_handler));
 
-  frontend::resouces::init();  
+  frontend::resouces::init();
   chat_controller::init();
   host_controller::init();
 
@@ -34,7 +60,8 @@ pub fn run_app() -> anyhow::Result<()> {
 
   frontend::hot_reload::watch(
     std::path::PathBuf::from("little-boat-client/ui/"),
-    arc_engine.clone());
+    arc_engine.clone(),
+  );
 
   arc_engine.exec();
 

@@ -165,6 +165,13 @@ fn parse_markdown_impl(msg: String) -> Vec<MessageItem> {
       }
       _ => {}
     }
+
+    if !current_text.is_empty() {
+      items.push(MessageItem {
+        content_type: current_type.clone(),
+        content: current_text.clone().into()
+      });
+    }
   }
 
   items

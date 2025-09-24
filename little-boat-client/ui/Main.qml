@@ -22,7 +22,7 @@ ApplicationWindow {
         id: themeSwitcher
         width: 40
         height: 40
-        radius: 20
+        radius: 5
         color: Style.darkTheme ? Style.darkMessageEven : Style.lightMessageEven
         anchors {
             top: parent.top
@@ -32,7 +32,7 @@ ApplicationWindow {
 
         Text {
             text: Style.darkTheme ? "☀️" : "🌙"
-            font.pointSize: 16
+            font.pointSize: 12
             anchors.centerIn: parent
         }
 
@@ -60,7 +60,7 @@ ApplicationWindow {
 
             ListView {
                 id: messageList
-                model: messagesListModel.messages
+                model: messagesListModel
                 spacing: 10
                 verticalLayoutDirection: ListView.BottomToTop
 
@@ -71,6 +71,9 @@ ApplicationWindow {
                     radius: 10
                     anchors.horizontalCenter: parent.horizontalCenter
 
+                    // Получаем данные сообщения через роль messageData
+                    property var messageItems: model.messageData || []
+
                     Column {
                         id: messageColumn
                         width: parent.width - 20
@@ -78,15 +81,16 @@ ApplicationWindow {
                         spacing: 5
 
                         Repeater {
-                            model: itemType && content ? itemType.length : 0
+                            model: parent.parent.messageItems
 
                             delegate: Text {
                                 width: parent.width
                                 wrapMode: Text.Wrap
-                                text: content[index] || ""
+                                text: modelData.content || ""
                                 color: Style.textColor
+
                                 font: {
-                                    switch(itemType[index]) {
+                                    switch(modelData.itemType) {
                                     case 1: return Qt.font({family: "Arial", bold: true, pointSize: 16})
                                     case 2: return Qt.font({family: "Arial", bold: true, pointSize: 14})
                                     case 3: return Qt.font({family: "Arial", bold: true, pointSize: 12})
@@ -122,29 +126,11 @@ ApplicationWindow {
                         placeholderText: "Type your message ..."
                         wrapMode: TextArea.Wrap
                         selectByMouse: true
-                        color: Style.textColor
-                        placeholderTextColor: Style.placeholderColor
-
-                        background: Rectangle {
-                            color: Style.inputBackgroundColor
-                            radius: 8
-                            border.width: 0
-                        }
                     }
                 }
 
                 Button {
                     text: "Send"
-                    background: Rectangle {
-                        color: Style.buttonBackgroundColor
-                        radius: 8
-                    }
-                    contentItem: Text {
-                        text: parent.text
-                        color: Style.buttonTextColor
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
                     onClicked: {
                         if (messageEdit.text.trim() !== "") {
                             messagesListModel.send_message(messageEdit.text)
@@ -155,12 +141,5 @@ ApplicationWindow {
             }
         }
     }
-
-    // Обработка сигналов
-    Connections {
-        target: messagesListModel
-        function onSend_message(message) {
-            console.log("Message sent to backend:", message)
-        }
-    }
+    
 }

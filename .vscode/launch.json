@@ -13,7 +13,8 @@
             ],
             "env": {
                 "QML_IMPORT_TRACE": "1",
-                "QT_QML_DEBUG": "1"
+                "QT_QML_DEBUG": "1",
+                "QT_QML_GENERATE_QMLLS_INI": "1"
             }
         },
         {
