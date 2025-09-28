@@ -46,58 +46,50 @@ ApplicationWindow {
         anchors.fill: parent
         spacing: 0
 
-        // Список сообщений
-        ScrollView {
-            id: messageScroll
+        ListView {
+            id: messageList
+            
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
+            spacing: 5
 
-            ScrollBar.vertical: ScrollBar {
-                background: Rectangle { color: Style.scrollbarBackgroundColor }
-                contentItem: Rectangle { color: Style.scrollbarHandleColor; radius: 3 }
-            }
+            model: messagesListModel
+            verticalLayoutDirection: ListView.BottomToTop
 
-            ListView {
-                id: messageList
-                model: messagesListModel
-                spacing: 10
-                verticalLayoutDirection: ListView.BottomToTop
+            delegate: Rectangle {
+                width: ListView.view.width - 20
+                height: messageColumn.height + 20
+                color: index % 2 === 0 ? Style.messageEvenColor : Style.messageOddColor
+                radius: 10
+                anchors.horizontalCenter: parent.horizontalCenter
 
-                delegate: Rectangle {
-                    width: ListView.view.width - 20
-                    height: messageColumn.height + 20
-                    color: index % 2 === 0 ? Style.messageEvenColor : Style.messageOddColor
-                    radius: 10
-                    anchors.horizontalCenter: parent.horizontalCenter
+                // Получаем данные сообщения через роль messageData
+                property var messageItems: model.messageData || []
 
-                    // Получаем данные сообщения через роль messageData
-                    property var messageItems: model.messageData || []
+                Column {
+                    id: messageColumn
+                    width: parent.width - 20
+                    anchors.centerIn: parent
+                    spacing: 5
 
-                    Column {
-                        id: messageColumn
-                        width: parent.width - 20
-                        anchors.centerIn: parent
-                        spacing: 5
+                    Repeater {
+                        model: parent.parent.messageItems
 
-                        Repeater {
-                            model: parent.parent.messageItems
+                        delegate: Text {
+                            width: parent.width
+                            wrapMode: Text.Wrap
+                            text: modelData.content || ""
+                            color: Style.textColor
 
-                            delegate: Text {
-                                width: parent.width
-                                wrapMode: Text.Wrap
-                                text: modelData.content || ""
-                                color: Style.textColor
-
-                                font: {
-                                    switch(modelData.itemType) {
-                                    case 1: return Qt.font({family: "Arial", bold: true, pointSize: 16})
-                                    case 2: return Qt.font({family: "Arial", bold: true, pointSize: 14})
-                                    case 3: return Qt.font({family: "Arial", bold: true, pointSize: 12})
-                                    case 4: return Qt.font({family: "Monospace", pointSize: 10})
-                                    case 5: return Qt.font({family: "Arial", italic: true, pointSize: 11})
-                                    default: return Qt.font({family: "Arial", pointSize: 11})
-                                    }
+                            font: {
+                                switch(modelData.itemType) {
+                                case 1: return Qt.font({family: "Arial", bold: true, pointSize: 16})
+                                case 2: return Qt.font({family: "Arial", bold: true, pointSize: 14})
+                                case 3: return Qt.font({family: "Arial", bold: true, pointSize: 12})
+                                case 4: return Qt.font({family: "Monospace", pointSize: 10})
+                                case 5: return Qt.font({family: "Arial", italic: true, pointSize: 11})
+                                default: return Qt.font({family: "Arial", pointSize: 11})
                                 }
                             }
                         }
@@ -105,6 +97,7 @@ ApplicationWindow {
                 }
             }
         }
+        
 
         // Панель ввода сообщения
         Rectangle {

@@ -118,11 +118,12 @@ impl QAbstractListModel for ChatMessage {
 fn parse_markdown_impl(msg: String) -> Vec<MessageItem> {
   let parser = Parser::new(&msg);
   let mut items = vec![];
-  let mut current_text = String::new();
-  let mut current_type = MessageItemType::Text;
-  let mut in_code_block = false;
 
   for event in parser {
+    let mut current_text = String::new();
+    let mut current_type = MessageItemType::Text;
+    let mut in_code_block = false;
+
     match event {
       Event::Start(tag) => {
         current_type = match tag {
@@ -148,22 +149,9 @@ fn parse_markdown_impl(msg: String) -> Vec<MessageItem> {
       }
       Event::Code(code) => {
         current_text.push_str(&code);
+        current_type = MessageItemType::Code;
       }
-      Event::End(tag) => match tag {
-        _ => {
-          // if !current_text.is_empty() {
-          //   add_message_item(&mut items, current_type, std::mem::take(&mut current_text));
-          // }
-          current_type = MessageItemType::Text;
-        }
-      },
-      Event::SoftBreak => {
-        current_text.push(' ');
-      }
-      Event::HardBreak => {
-        current_text.push('\n');
-      }
-      _ => {}
+      _ => continue
     }
 
     if !current_text.is_empty() {
