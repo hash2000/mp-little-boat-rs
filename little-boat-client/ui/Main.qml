@@ -4,6 +4,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Chat
 import "./Themes"
+import "./Chat"
 
 ApplicationWindow {
     id: root
@@ -13,126 +14,91 @@ ApplicationWindow {
     title: "Chat"
     color: Style.backgroundColor
 
-    ChatMessagesListModel {
-        id: messagesListModel
-    }
-
-    // Панель переключения темы
-    Rectangle {
-        id: themeSwitcher
-        width: 40
-        height: 40
-        radius: 5
-        color: Style.darkTheme ? Style.darkMessageEven : Style.lightMessageEven
-        anchors {
-            top: parent.top
-            right: parent.right
-            margins: 10
-        }
-
-        Text {
-            text: Style.darkTheme ? "☀️" : "🌙"
-            font.pointSize: 12
-            anchors.centerIn: parent
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: Style.darkTheme = !Style.darkTheme
-        }
-    }
-
-    ColumnLayout {
+    RowLayout {
         anchors.fill: parent
         spacing: 0
 
-        ListView {
-            id: messageList
-            
-            Layout.fillWidth: true
+        Rectangle {
+            id: leftPanel
+            Layout.preferredWidth: 32
             Layout.fillHeight: true
-            clip: true
-            spacing: 5
+            color: Style.darkTheme ? Style.darkMessageEven : Style.lightMessageEven
 
-            model: messagesListModel
-            verticalLayoutDirection: ListView.BottomToTop
-
-            delegate: Rectangle {
-                width: ListView.view.width - 20
-                height: messageColumn.height + 20
-                color: index % 2 === 0 ? Style.messageEvenColor : Style.messageOddColor
-                radius: 10
+            Button {
+                id: settingsButton
+                width: parent.width
+                height: 32
+                anchors.top: parent.top
                 anchors.horizontalCenter: parent.horizontalCenter
 
-                // Получаем данные сообщения через роль messageData
-                property var messageItems: model.messageData || []
+                background: Rectangle {
+                    color: "transparent"
+                }
 
-                Column {
-                    id: messageColumn
-                    width: parent.width - 20
-                    anchors.centerIn: parent
-                    spacing: 5
-
+                contentItem: Column {
+                    spacing: 2
                     Repeater {
-                        model: parent.parent.messageItems
-
-                        delegate: Text {
-                            width: parent.width
-                            wrapMode: Text.Wrap
-                            text: modelData.content || ""
+                        model: 3
+                        Rectangle {
+                            width: 12
+                            height: 2
                             color: Style.textColor
-
-                            font: {
-                                switch(modelData.itemType) {
-                                case 1: return Qt.font({family: "Arial", bold: true, pointSize: 16})
-                                case 2: return Qt.font({family: "Arial", bold: true, pointSize: 14})
-                                case 3: return Qt.font({family: "Arial", bold: true, pointSize: 12})
-                                case 4: return Qt.font({family: "Monospace", pointSize: 10})
-                                case 5: return Qt.font({family: "Arial", italic: true, pointSize: 11})
-                                default: return Qt.font({family: "Arial", pointSize: 11})
-                                }
-                            }
+                            radius: 1
                         }
                     }
                 }
+
+                onClicked: settingsDrawer.open()
             }
         }
-        
 
-        // Панель ввода сообщения
-        Rectangle {
+        // Основная область с чатом
+        ChatView {
             Layout.fillWidth: true
-            Layout.preferredHeight: Math.min(messageEdit.implicitHeight + 20, 150)
-            color: "transparent"
-
-            RowLayout {
-                anchors.fill: parent
-                anchors.margins: 10
-                spacing: 10
-
-                ScrollView {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-
-                    TextArea {
-                        id: messageEdit
-                        placeholderText: "Type your message ..."
-                        wrapMode: TextArea.Wrap
-                        selectByMouse: true
-                    }
-                }
-
-                Button {
-                    text: "Send"
-                    onClicked: {
-                        if (messageEdit.text.trim() !== "") {
-                            messagesListModel.send_message(messageEdit.text)
-                            messageEdit.clear()
-                        }
-                    }
-                }
-            }
+            Layout.fillHeight: true
         }
     }
-    
+
+    // Выдвижная панель параметров
+    Drawer {
+        id: settingsDrawer
+        width: 220
+        height: parent.height
+        edge: Qt.LeftEdge
+        dragMargin: 16 // Чтобы можно было открыть от левого края
+
+        ColumnLayout {
+            anchors.fill: parent
+            spacing: 10
+
+            // Заголовок
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 32
+                color: Style.darkTheme ? Style.darkMessageOdd : Style.lightMessageOdd
+
+                Text {
+                    text: "Settings"
+                    color: Style.textColor
+                    font.bold: true
+                    font.pointSize: 14
+                    anchors.centerIn: parent
+                }
+            }
+
+            // Переключатель темы
+            Button {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 40
+                text: Style.darkTheme ? "☀️ Light Theme" : "🌙 Dark Theme"
+                onClicked: Style.darkTheme = !Style.darkTheme
+            }
+
+            // Другие настройки можно добавить здесь
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+        }
+    }    
 }
