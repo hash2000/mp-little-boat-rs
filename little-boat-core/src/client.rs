@@ -27,10 +27,6 @@ impl ClientApp {
     Ok(app)
   }
 
-  pub async fn serve(&mut self, name: &str) -> anyhow::Result<()> {
-    self.service_manager.start(name, self.cfg.clone()).await
-  }
-
   pub fn stop(&self, name: &str) -> anyhow::Result<()> {
     self.service_manager.stop(name)
   }
@@ -52,11 +48,15 @@ impl ClientApp {
     self.process_service_events().await?;
 
     // wait when all services ended
-    self.service_manager.wait_services().await?;
+    self.wait_services().await?;
 
     little_boat_abstractions::log_info!("client-app", "Client application stopped");
 
     Ok(())
+  }
+
+  async fn serve(&mut self, name: &str) -> anyhow::Result<()> {
+    self.service_manager.start(name, self.cfg.clone()).await
   }
 
   async fn process_service_events(&mut self) -> anyhow::Result<bool> {
