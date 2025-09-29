@@ -24,8 +24,9 @@ ColumnLayout {
        // verticalLayoutDirection: ListView.BottomToTop
 
         onCountChanged: {
-            console.log("ListView: count changes")
-            positionViewAtEnd()
+            Qt.callLater(function() {
+                positionViewAtEnd()
+            })
         }
 
         delegate: Rectangle {
