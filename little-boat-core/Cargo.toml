@@ -12,13 +12,7 @@ repository.workspace = true
 path = "src/lib.rs"
 
 [dependencies]
-little-boat-db = { path = "../little-boat-db" }
-little-boat-abstractions = { path = "../little-boat-abstractions" }
-little-boat-service-signaling = { path = "../little-boat-service-signaling"}
-little-boat-service-chat = { path = "../little-boat-service-chat"}
-anyhow.workspace = true
-directories-next.workspace = true
-simd-json.workspace = true
-tokio.workspace = true
 log.workspace = true
 env_logger.workspace = true
+anyhow.workspace = true
+tokio.workspace = true

@@ -14,16 +14,12 @@ name = "little-boat-client"
 path = "src/main.rs"
 
 [dependencies]
-little-boat-db = { path = "../little-boat-db" }
 little-boat-core = { path = "../little-boat-core" }
-tokio.workspace = true
-qmetaobject.workspace = true
-cstr.workspace = true
+
 anyhow.workspace = true
-simd-json.workspace = true
-pulldown-cmark.workspace = true
-
-notify.workspace = true
-
 log.workspace = true
 env_logger.workspace = true
+tokio.workspace = true
+
+simd-json.workspace = true
+pulldown-cmark.workspace = true
