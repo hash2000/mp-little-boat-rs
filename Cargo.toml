@@ -20,7 +20,7 @@ log = "0.4.27"
 env_logger = "0.11.8"
 
 # errors 
-thiserror = "2"
+thiserror = "2.0.17"
 anyhow = "1.0.100"
 
 # key-value embedded database
@@ -31,20 +31,20 @@ async-trait = "0.1.88"
 futures = "0.3.31"
 tokio-test = "0.4"
 tokio-stream = "0.1.17"
-tokio-tungstenite = "0.27.0"
+tokio-tungstenite = "0.28.0"
 tokio = { version = "1.47.1", features = [
 	"full"
 ] }
 
 # desktop UI
-
+iced = { git = "https://github.com/hash2000/iced.git", branch = "master"}
 
 ## parsers tokenizers
 # markdown parser
 pulldown-cmark = "0.13.0"
 
 # json
-simd-json = "0.16.0"
+simd-json = "0.17.0"
 serde = { version = "1.0.226", features = ["derive"] }
 serde_json = "1.0.145"
 

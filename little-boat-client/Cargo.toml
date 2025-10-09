@@ -23,3 +23,6 @@ tokio.workspace = true
 
 simd-json.workspace = true
 pulldown-cmark.workspace = true
+
+iced.workspace = true
+iced.features = ["highlighter", "tokio", "debug"]
