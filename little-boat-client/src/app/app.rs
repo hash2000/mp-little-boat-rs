@@ -2,11 +2,12 @@ use std::time::Duration;
 
 use iced::futures::io::Window;
 use iced::window::Id;
-use iced::{event, window, Element, Subscription, Task, Theme};
+use iced::{color, event, window, Element, Font, Subscription, Task, Theme};
 use iced::widget::{
-  button, center, column, container, mouse_area, opaque, operation, pick_list, row, space, stack,
-  text, text_input,
+  button, center, column, container, mouse_area, opaque, operation, pick_list, rich_text, row, space, span, stack, text, text_input, Column
 };
+use litle_boat_widgets::widgets::selectable_rich_text::selectable_rich_text;
+use litle_boat_widgets::widgets::selectable_text::selectable_text;
 
 use crate::app::Message;
 use crate::app::window_events::*;
@@ -58,16 +59,39 @@ impl App {
       },
       Message::Tick(now) => {
         Task::none()
+      },
+      Message::OnLink(draft) => {
+        Task::none()
       }
     }
   }
 
   pub fn view(&self, id: window::Id) -> Element<'_, Message> {
-    let content = column![
-      text("").size(32)
-    ];
+    // let test_text1 = selectable_rich_text::<_, _, (), _, _>(
+    //   vec![
+    //     span("Additionally, this tour can also run on WebAssembly "),
+    //     span("by leveraging ",),
+    //     span("trunk")
+    //       .color(color!(0x7777FF))
+    //       .underline(true)
+    //       .font(Font::MONOSPACE),
+    //     span(".")
+    //   ])
+    //   .on_link(Message::OnLink);
 
-    content.into()
+    // let test_text2 = selectable_text("any text");
+      
+    container(
+      row![
+        // test_text2,
+        // test_text1,
+      ]
+    ).into()
+
+  }
+
+  fn container(title: &str) -> Column<'_, Message> {
+    column![text(title).size(50)].spacing(20)
   }
 
   pub fn subscription(&self) -> Subscription<Message> {

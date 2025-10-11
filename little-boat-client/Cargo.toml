@@ -15,6 +15,7 @@ path = "src/main.rs"
 
 [dependencies]
 little-boat-core = { path = "../little-boat-core" }
+litle-boat-widgets = { path = "../little-boat-widgets" }
 
 anyhow.workspace = true
 log.workspace = true
