@@ -1,16 +1,16 @@
 use std::time::Duration;
 
-use iced::futures::io::Window;
-use iced::window::Id;
-use iced::{color, event, window, Element, Font, Subscription, Task, Theme};
+use iced::{color, window, Font, Subscription, Task};
 use iced::widget::{
-  button, center, column, container, mouse_area, opaque, operation, pick_list, rich_text, row, space, span, stack, text, text_input, Column
+  button, center, column, container, mouse_area, opaque, operation, pick_list, rich_text, row, 
+  space, span, stack, text, text_input, Column
 };
 use litle_boat_widgets::widgets::selectable_rich_text::selectable_rich_text;
 use litle_boat_widgets::widgets::selectable_text::selectable_text;
+use litle_boat_widgets::widgets::{Renderer, Element};
+use litle_boat_widgets::Theme;
 
 use crate::app::Message;
-use crate::app::window_events::*;
 
 pub struct App {
   pub(crate) show_modal: bool,
@@ -37,7 +37,7 @@ impl App {
   }
 
   pub fn theme(&self, _window_id: window::Id) -> Theme {
-    Theme::Dark
+    Theme::default()
   }
 
   pub fn scale_factor(&self, _window_id: window::Id) -> f32 {
@@ -67,24 +67,24 @@ impl App {
   }
 
   pub fn view(&self, id: window::Id) -> Element<'_, Message> {
-    // let test_text1 = selectable_rich_text::<_, _, (), _, _>(
-    //   vec![
-    //     span("Additionally, this tour can also run on WebAssembly "),
-    //     span("by leveraging ",),
-    //     span("trunk")
-    //       .color(color!(0x7777FF))
-    //       .underline(true)
-    //       .font(Font::MONOSPACE),
-    //     span(".")
-    //   ])
-    //   .on_link(Message::OnLink);
+    let test_text1 = selectable_rich_text::<_, _, (), _, _>(
+      vec![
+        span("Additionally, this tour can also run on WebAssembly "),
+        span("by leveraging ",),
+        span("trunk")
+          .color(color!(0x7777FF))
+          .underline(true)
+          .font(Font::MONOSPACE),
+        span(".")
+      ])
+      .on_link(Message::OnLink);
 
-    // let test_text2 = selectable_text("any text");
+    let test_text2 = selectable_text("any text");
       
     container(
       row![
-        // test_text2,
-        // test_text1,
+        test_text2,
+        test_text1,
       ]
     ).into()
 
