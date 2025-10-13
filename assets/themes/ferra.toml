@@ -29,7 +29,7 @@ code = "#af8d9f"
 nickname = "#f6b6c9"
 nickname_offline = "#a8a8a8"
 url = "#d1d1e0"
-selection = "#453d41"
+selection = "#6e3dafff"
 border_selected = "#7d6e76"
 
 [buffer.server_messages]

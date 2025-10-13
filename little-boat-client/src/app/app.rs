@@ -7,7 +7,7 @@ use iced::widget::{
 };
 use litle_boat_widgets::widgets::selectable_rich_text::selectable_rich_text;
 use litle_boat_widgets::widgets::selectable_text::selectable_text;
-use litle_boat_widgets::widgets::{Renderer, Element};
+use litle_boat_widgets::widgets::Element;
 use litle_boat_widgets::Theme;
 
 use crate::app::Message;
@@ -83,8 +83,8 @@ impl App {
       
     container(
       row![
-        test_text2,
         test_text1,
+        test_text2,
       ]
     ).into()
 
