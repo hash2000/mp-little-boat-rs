@@ -9,6 +9,8 @@ pub mod container;
 pub mod context_menu;
 pub mod selectable_text;
 pub mod text;
+pub mod button;
+pub mod font_style;
 
 // TODO: If we use non-standard font sizes, we should consider
 // Config.font.size since it's user configurable

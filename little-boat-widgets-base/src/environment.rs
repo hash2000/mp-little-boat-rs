@@ -3,6 +3,7 @@ use std::path::PathBuf;
 
 pub const CONFIG_FILE_NAME: &str = "config.toml";
 pub const APP_NAME: &str = "mp_little_boat";
+pub const APP_VERSION: &str = "0.0.1";
 
 pub fn config_dir() -> PathBuf {
   portable_dir().unwrap_or_else(platform_specific_config_dir)

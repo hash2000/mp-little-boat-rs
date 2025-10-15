@@ -14,3 +14,4 @@ pub mod target;
 pub mod bouncer;
 pub mod server;
 pub mod channel;
+pub mod shortcut;

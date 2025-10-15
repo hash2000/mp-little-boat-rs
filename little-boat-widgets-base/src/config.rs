@@ -2,6 +2,10 @@ use std::path::PathBuf;
 
 use crate::environment;
 
+pub use self::keys::Keyboard;
+
+pub mod keys;
+
 #[derive(Debug, Clone, Default)]
 pub struct Config {}
 
