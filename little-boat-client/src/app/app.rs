@@ -1,22 +1,16 @@
 use std::time::Duration;
 
-use iced::{color, window, Font, Subscription, Task};
+use iced::{color, padding, window, Element, Font, Length, Subscription, Task, Theme};
 use iced::widget::{
   button, center, column, container, mouse_area, opaque, operation, pick_list, rich_text, row, 
   space, span, stack, text, text_input, Column
 };
-use litle_boat_widgets::widgets::selectable_rich_text::selectable_rich_text;
-use litle_boat_widgets::widgets::selectable_text::selectable_text;
-use litle_boat_widgets::widgets::Element;
-use litle_boat_widgets::Theme;
 
 use crate::app::Message;
 
 pub struct App {
-  pub(crate) show_modal: bool,
   pub(crate) window_id: window::Id,
 }
-
 
 impl App {
   pub fn new() -> (Self, Task<Message>) {
@@ -24,8 +18,7 @@ impl App {
     let (id, open) = window::open(window::Settings::default());
 
     (
-      Self { 
-        show_modal: false, 
+      Self {
         window_id: id,
       },
       open.map(Message::WindowOpened),
@@ -37,7 +30,7 @@ impl App {
   }
 
   pub fn theme(&self, _window_id: window::Id) -> Theme {
-    Theme::default()
+    Theme::KanagawaDragon
   }
 
   pub fn scale_factor(&self, _window_id: window::Id) -> f32 {
@@ -47,51 +40,40 @@ impl App {
 
   pub fn update(&mut self, message: Message) -> Task<Message> {
     match message {
-      Message::WindowOpened(id) => {
-        Task::none()
-      },
-      Message::Window(id, event ) => {
-        if id == self.window_id {
-          self.process_window_events(event)
-        } else {
+        Message::WindowOpened(id) => {
           Task::none()
-        }
-      },
-      Message::Tick(now) => {
-        Task::none()
-      },
-      Message::OnLink(draft) => {
-        Task::none()
-      }
+        },
+        Message::Window(id, event ) => {
+          if id == self.window_id {
+            self.process_window_events(event)
+          } else {
+            Task::none()
+          }
+        },
+        Message::Tick(now) => {
+          Task::none()
+        },
     }
   }
-
+  
   pub fn view(&self, id: window::Id) -> Element<'_, Message> {
-    let test_text1 = selectable_rich_text::<_, _, (), _, _>(
-      vec![
-        span("Additionally, this tour can also run on WebAssembly "),
-        span("by leveraging ",),
-        span("trunk")
-          .color(color!(0x7777FF))
-          .underline(true)
-          .font(Font::MONOSPACE),
-        span(".")
-      ])
-      .on_link(Message::OnLink);
+    if id != self.window_id {
+      column![].into()
+    } else {
+      // let screen = match &self.screen {
+      //   Screen::Welcome(welcome) => welcome.view(id).map(Message::Welcome)
+      // };
 
-    let test_text2 = selectable_text("any text");
-      
-    container(
-      row![
-        test_text1,
-        test_text2,
-      ]
-    ).into()
+      // let content = container(
+      // container(screen)
+      //   .width(Length::Fill)
+      //   .height(Length::Fill)
+      //   .style(theme::container::general),
+      // )
+      // .padding(padding::top(0));
 
-  }
-
-  fn container(title: &str) -> Column<'_, Message> {
-    column![text(title).size(50)].spacing(20)
+      column![].into()
+    }
   }
 
   pub fn subscription(&self) -> Subscription<Message> {

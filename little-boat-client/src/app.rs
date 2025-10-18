@@ -1,6 +1,5 @@
 mod app;
 mod messages;
-mod modals;
 mod window_events;
 
 pub use crate::app::messages::Message;
