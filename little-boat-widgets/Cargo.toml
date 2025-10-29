@@ -1,0 +1,28 @@
+[package]
+name = "little-boat-widgets"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+categories.workspace = true
+repository.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+iced_core.workspace = true
+iced.workspace = true
+iced.features = [
+    "wgpu",
+    "tiny-skia",
+    "fira-sans",
+    "tokio",
+    "lazy",
+    "advanced",
+    "image",
+]
+
+unicode-segmentation.workspace = true
+itertools.workspace = true

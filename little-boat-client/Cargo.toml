@@ -14,13 +14,20 @@ name = "little-boat-client"
 path = "src/main.rs"
 
 [dependencies]
+little-boat-core = { path = "../little-boat-core" }
+little-boat-widgets = { path = "../little-boat-widgets" }
+
 anyhow.workspace = true
 log.workspace = true
 env_logger.workspace = true
 tokio.workspace = true
+thiserror.workspace = true
+uuid.workspace = true
+uuid.features = ["v4"]
 
 simd-json.workspace = true
 pulldown-cmark.workspace = true
 
 iced.workspace = true
 iced.features = ["highlighter", "tokio", "debug"]
+iced_widget.workspace = true
